@@ -96,6 +96,14 @@ export default function HomepageFrame() {
         const reel = document.getElementById(`social-${index + 1}`);
         if (reel) reel.setAttribute("src", source);
       });
+      const transparencyHeading = Array.from(document.querySelectorAll("h2")).find((heading) =>
+        heading.textContent?.trim() === "Transparency Builds Trust"
+      );
+      const transparencyImage = transparencyHeading?.closest("section")?.querySelector("image-slot");
+      if (transparencyImage) {
+        transparencyImage.setAttribute("src", "/sectors/community.jpg");
+        transparencyImage.setAttribute("alt", "Community members joining hands together");
+      }
       setText("#hero h1", content.heroTitle);
       setText("#hero p", content.heroKicker);
       setText("#hero h1 + p", content.heroIntro);
