@@ -88,10 +88,10 @@ export default function HomepageFrame() {
       const setText = (selector: string, value: string) => { const element = document.querySelector(selector); if (element && value) element.textContent = value; };
       const background = document.getElementById("hero-bg");
       if (background && content.heroImage) background.setAttribute("src", content.heroImage);
-      const elliePhoto = document.getElementById("team-ellie");
-      const sybilPhoto = document.getElementById("team-sybil");
-      if (elliePhoto) elliePhoto.setAttribute("src", "/team/ellie.jpeg");
-      if (sybilPhoto) sybilPhoto.setAttribute("src", "/team/sybil.jpg");
+      ["team-ellie", "team-sybil"].forEach((id) => {
+        const photo = document.getElementById(id);
+        if (photo) photo.style.display = "none";
+      });
       ["/social/community-market.jpg", "/social/digital-hub.jpg", "/social/hermanus-landscape.jpg"].forEach((source, index) => {
         const reel = document.getElementById(`social-${index + 1}`);
         if (reel) reel.setAttribute("src", source);
