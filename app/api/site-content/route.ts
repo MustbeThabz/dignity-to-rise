@@ -10,7 +10,8 @@ const contentSchema = z.object({
   heroKicker: z.string().trim().min(1).max(120), heroTitle: z.string().trim().min(1).max(180), heroIntro: z.string().trim().min(1).max(300), heroButtonText: z.string().trim().min(1).max(60),
   visionTitle: z.string().trim().min(1).max(180), visionCopy: z.string().trim().min(1).max(600), ctaTitle: z.string().trim().min(1).max(180), ctaCopy: z.string().trim().min(1).max(300),
   contactHeading: z.string().trim().min(1).max(160), contactCopy: z.string().trim().min(1).max(400),
-  impactHeading: z.string().trim().min(1).max(100), impactStats: z.array(z.object({ label: z.string().trim().min(1).max(50), value: z.string().trim().min(1).max(30) })).min(1).max(6)
+  impactHeading: z.string().trim().min(1).max(100), impactStats: z.array(z.object({ label: z.string().trim().min(1).max(50), value: z.string().trim().min(1).max(30) })).min(1).max(6),
+  sectors: z.array(z.object({ title: z.string().trim().min(1).max(60), live: z.string().trim().min(1).max(20), done: z.string().trim().min(1).max(20), future: z.string().trim().min(1).max(20), image: z.string().trim().min(1).max(1000), liveProjects: z.array(z.string().trim().min(1).max(120)).max(30), doneProjects: z.array(z.string().trim().min(1).max(120)).max(30), futureProjects: z.array(z.string().trim().min(1).max(120)).max(30) })).length(6)
 });
 
 export async function GET() {

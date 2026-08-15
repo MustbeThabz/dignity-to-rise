@@ -67,6 +67,19 @@ export default function HomepageFrame() {
       #hero-bg { transform: scale(1.08); transform-origin: center; filter: saturate(1.04) contrast(1.03); }
       #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(138px,12vw,210px); pointer-events:none; opacity:.48; }
       #d2r-hero-brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.42)); }
+      #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
+      #d2r-sector-projects.is-open { display:flex; }
+      .d2r-sector-dialog { position:relative; width:min(760px,100%); max-height:min(82vh,760px); overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; color:#1A1A1A; box-shadow:0 28px 90px rgba(0,0,0,.38); }
+      .d2r-sector-dialog > button { position:absolute; top:16px; right:16px; border:1px solid #006A4E; background:transparent; color:#006A4E; padding:9px 12px; font:600 11px Barlow,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+      .d2r-sector-dialog > p { margin:0 0 8px; color:#B89454; font:600 11px Barlow,sans-serif; letter-spacing:.18em; text-transform:uppercase; }
+      .d2r-sector-dialog > h2 { margin:0 0 26px; color:#006A4E; font:600 clamp(34px,5vw,52px)/1 Cormorant Garamond,serif; }
+      .d2r-sector-dialog > div { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+      .d2r-sector-dialog section { padding:18px; border:1px solid #E0D8C9; background:#fff; }
+      .d2r-sector-dialog h3 { margin:0 0 12px; color:#006A4E; font:600 13px Barlow,sans-serif; letter-spacing:.09em; text-transform:uppercase; }
+      .d2r-sector-dialog ul { margin:0; padding:0; list-style:none; }
+      .d2r-sector-dialog li { padding:9px 0; border-top:1px solid #EEE8DD; color:#514E48; font:14px/1.35 Barlow,sans-serif; }
+      .d2r-sector-dialog li:first-child { border-top:0; }
+      @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
       @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } #d2r-hero-brand { width:118px; right:16px; bottom:80px; opacity:.42; } }
     `;
     document.head.appendChild(style);
@@ -122,6 +135,52 @@ export default function HomepageFrame() {
         const elements = item.querySelectorAll("div");
         if (elements[0]) elements[0].textContent = stat.value;
         if (elements[1]) elements[1].textContent = stat.label;
+      });
+      const sectorTiles = Array.from(document.querySelectorAll("#sectors .d2r-sectors-grid > a"));
+      content.sectors?.forEach((sector: { title: string; live: string; done: string; future: string; image: string; liveProjects: string[]; doneProjects: string[]; futureProjects: string[] }, index: number) => {
+        const tile = sectorTiles[index] as HTMLAnchorElement | undefined;
+        if (!tile) return;
+        const image = tile.querySelector("image-slot");
+        if (image) image.setAttribute("src", sector.image);
+        const title = tile.querySelector("h3");
+        if (title) title.textContent = sector.title;
+        const stats = title?.nextElementSibling;
+        const values = [String(sector.liveProjects?.length ?? sector.live), String(sector.doneProjects?.length ?? sector.done), String(sector.futureProjects?.length ?? sector.future)];
+        stats?.querySelectorAll("span").forEach((stat, statIndex) => {
+          const labels = ["Live", "Done", "Future"];
+          stat.innerHTML = `<strong style="color:#fff;font-weight:600;">${values[statIndex] ?? "0"}</strong> ${labels[statIndex] ?? ""}`;
+        });
+        tile.setAttribute("href", "#sector-projects");
+        tile.onclick = (event) => {
+          event.preventDefault();
+          let modal = document.getElementById("d2r-sector-projects");
+          if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "d2r-sector-projects";
+            modal.innerHTML = '<div class="d2r-sector-dialog" role="dialog" aria-modal="true"><button type="button" aria-label="Close project list">Close</button><p></p><h2></h2><div></div></div>';
+            document.body.appendChild(modal);
+            modal.addEventListener("click", (closeEvent) => { if (closeEvent.target === modal || (closeEvent.target as Element).closest("button")) modal?.classList.remove("is-open"); });
+          }
+          const dialog = modal.querySelector(".d2r-sector-dialog");
+          const eyebrow = dialog?.querySelector("p");
+          const heading = dialog?.querySelector("h2");
+          const lists = dialog?.querySelector("div");
+          if (eyebrow) eyebrow.textContent = "Sector projects";
+          if (heading) heading.textContent = sector.title;
+          if (lists) {
+            lists.replaceChildren();
+            const projectGroups: [string, string[]][] = [["Live", sector.liveProjects], ["Completed", sector.doneProjects], ["Future", sector.futureProjects]];
+            projectGroups.forEach(([label, projects]) => {
+              const group = document.createElement("section");
+              const groupHeading = document.createElement("h3"); groupHeading.textContent = `${label} (${projects.length})`;
+              const list = document.createElement("ul");
+              projects.forEach((project) => { const item = document.createElement("li"); item.textContent = project; list.appendChild(item); });
+              if (!projects.length) { const item = document.createElement("li"); item.textContent = "No projects listed yet."; list.appendChild(item); }
+              group.append(groupHeading, list); lists.appendChild(group);
+            });
+          }
+          modal.classList.add("is-open");
+        };
       });
     } catch (error) { console.error("Could not apply managed site content", error); }
   }
