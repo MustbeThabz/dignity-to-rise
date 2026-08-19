@@ -88,7 +88,10 @@ export default function HomepageFrame() {
 
   function polishHero() {
     const document = frameRef.current?.contentDocument;
-    if (!document || document.getElementById("d2r-hero-polish")) return;
+    if (!document) return;
+    const hero = document.getElementById("top");
+    hero?.querySelectorAll("image-slot:not(#hero-bg)").forEach((element) => { (element as HTMLElement).style.display = "none"; });
+    if (document.getElementById("d2r-hero-polish")) return;
     const style = document.createElement("style");
     style.id = "d2r-hero-polish";
     style.textContent = `
@@ -119,7 +122,6 @@ export default function HomepageFrame() {
       @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } #d2r-hero-brand { width:118px; right:16px; bottom:80px; opacity:.42; } }
     `;
     document.head.appendChild(style);
-    const hero = document.getElementById("top");
     if (!hero) return;
     const brand = document.createElement("div");
     brand.id = "d2r-hero-brand";
