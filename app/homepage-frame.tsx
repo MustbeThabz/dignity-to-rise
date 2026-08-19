@@ -152,10 +152,11 @@ export default function HomepageFrame() {
         transparencyImage.setAttribute("src", "/sectors/community.jpg");
         transparencyImage.setAttribute("alt", "Community members joining hands together");
       }
-      const changemakersHeading = Array.from(document.querySelectorAll("h2")).find((heading) => heading.textContent?.trim() === "Meet the Changemakers");
+      const changemakersHeading = Array.from(document.querySelectorAll("h2")).find((heading) => heading.textContent?.toLowerCase().includes("changemaker"));
       const changemakersSection = changemakersHeading?.closest("section");
       if (changemakersSection && !changemakersSection.dataset.rosterAdded) {
         changemakersSection.dataset.rosterAdded = "true";
+        changemakersSection.querySelectorAll(".d2r-cmcard").forEach((card) => { (card as HTMLElement).style.display = "none"; });
         Array.from(changemakersSection.children).filter((child) => !child.contains(changemakersHeading ?? null)).forEach((child) => { (child as HTMLElement).style.display = "none"; });
         const roster = document.createElement("div");
         roster.className = "d2r-changemakers-roster";
