@@ -94,7 +94,7 @@ export default function HomepageFrame() {
     style.textContent = `
       #top { height: 100svh !important; min-height: 700px !important; }
       #hero-bg { transform: scale(1.08); transform-origin: center; filter: saturate(1.04) contrast(1.03); }
-      #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(118px,10vw,176px); pointer-events:none; opacity:.72; }
+      #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(118px,10vw,176px); aspect-ratio:1.6/1; overflow:hidden; pointer-events:none; opacity:.72; }
       #d2r-hero-brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.42)); }
       #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
       #d2r-sector-projects.is-open { display:flex; }
