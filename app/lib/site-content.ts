@@ -41,7 +41,7 @@ export const defaultSiteContent: SiteContent = {
   contactHeading: "People, not forms.",
   contactCopy: "Reach out to us directly — we would love to hear from you.",
   impactHeading: "The movement in numbers",
-  impactStats: [{ label: "Projects completed", value: "14" }, { label: "Jobs created", value: "76" }, { label: "People impacted", value: "8,950+" }, { label: "Meals provided", value: "127,000+" }, { label: "People upskilled", value: "1,240+" }, { label: "Businesses supported", value: "36" }],
+  impactStats: [{ label: "Projects completed", value: "0" }, { label: "Jobs created", value: "0" }, { label: "People impacted", value: "0" }, { label: "Meals provided", value: "0" }, { label: "People upskilled", value: "0" }, { label: "Businesses supported", value: "0" }],
   sectors: [
     { title: "Agriculture & Food", live: "1", done: "0", future: "1", image: "/sectors/agriculture-food.jpg", liveProjects: ["Central Growzone"], doneProjects: [], futureProjects: ["Community Growzone"] },
     { title: "Construction", live: "0", done: "0", future: "1", image: "/sectors/construction.jpg", liveProjects: [], doneProjects: [], futureProjects: ["Small Business Hubs"] },

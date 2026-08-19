@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { volunteersCollection } from "../../lib/mongodb";
 import { uploadVolunteerRecord } from "../../lib/google-drive";
+import { sendAcknowledgement } from "../../lib/email";
 
 const schema = z.object({
   kind: z.enum(["partner", "mentor", "contribution"]), name: z.string().trim().min(2).max(120), email: z.string().trim().email().max(254),
@@ -17,6 +18,7 @@ export async function POST(request: Request) {
     const collection = await volunteersCollection();
     const result = await collection.db.collection("enquiries").insertOne(record);
     await uploadVolunteerRecord(`${record.kind}-enquiry-${result.insertedId}.json`, { ...record, id: result.insertedId.toString() });
+    await sendAcknowledgement({ email: record.email, name: record.name, formName: `${record.kind} form` });
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Enquiry submission failed", error);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { volunteersCollection } from "../../lib/mongodb";
 import { uploadVolunteerRecord } from "../../lib/google-drive";
+import { sendAcknowledgement } from "../../lib/email";
 
 const availability = z.record(z.string(), z.array(z.enum(["morning", "afternoon", "evening"])));
 const schema = z.object({
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
     const collection = await volunteersCollection();
     const result = await collection.insertOne(record);
     const sentToDrive = await uploadVolunteerRecord(`volunteer-${result.insertedId}.json`, { ...record, id: result.insertedId.toString() });
+    await sendAcknowledgement({ email: record.email, name: record.firstName, formName: "volunteer registration" });
 
     return NextResponse.json({ ok: true, sentToDrive });
   } catch (error) {

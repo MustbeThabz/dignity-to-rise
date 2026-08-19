@@ -28,6 +28,35 @@ export default function HomepageFrame() {
     }, true);
   }
 
+  function connectNewsletterSignup() {
+    const document = frameRef.current?.contentDocument;
+    if (!document || document.documentElement.dataset.newsletterConnected) return;
+    const emailInput = document.querySelector<HTMLInputElement>(".d2r-news-input");
+    const button = Array.from(document.querySelectorAll("button")).find((item) => item.textContent?.trim() === "Subscribe");
+    if (!emailInput || !button) return;
+    document.documentElement.dataset.newsletterConnected = "true";
+    const message = document.createElement("p");
+    message.setAttribute("role", "status");
+    message.style.cssText = "width:100%;margin:4px 0 0;color:#fff;font:13px/1.4 Barlow,sans-serif;";
+    button.parentElement?.after(message);
+    button.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      button.disabled = true;
+      message.textContent = "Saving your email...";
+      try {
+        const response = await fetch("/api/newsletter", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error);
+        emailInput.value = "";
+        message.textContent = "Thank you. You are on the mailing list.";
+      } catch (error) {
+        message.textContent = error instanceof Error ? error.message : "We could not save your email. Please try again.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
   function compactFooter() {
     const document = frameRef.current?.contentDocument;
     if (!document || document.getElementById("d2r-compact-footer-v3")) return;
@@ -65,7 +94,7 @@ export default function HomepageFrame() {
     style.textContent = `
       #top { height: 100svh !important; min-height: 700px !important; }
       #hero-bg { transform: scale(1.08); transform-origin: center; filter: saturate(1.04) contrast(1.03); }
-      #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(138px,12vw,210px); pointer-events:none; opacity:.48; }
+      #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(118px,10vw,176px); pointer-events:none; opacity:.72; }
       #d2r-hero-brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.42)); }
       #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
       #d2r-sector-projects.is-open { display:flex; }
@@ -79,7 +108,13 @@ export default function HomepageFrame() {
       .d2r-sector-dialog ul { margin:0; padding:0; list-style:none; }
       .d2r-sector-dialog li { padding:9px 0; border-top:1px solid #EEE8DD; color:#514E48; font:14px/1.35 Barlow,sans-serif; }
       .d2r-sector-dialog li:first-child { border-top:0; }
+      .d2r-changemakers-roster { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin:32px auto 0; max-width:1120px; }
+      .d2r-changemakers-roster button { min-height:112px; border:1px solid #D8B872; background:#fff; color:#006A4E; padding:18px; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; }
+      .d2r-changemakers-roster button:hover { background:#F8F5EF; }
+      .d2r-changemaker-bio { grid-column:1/-1; display:none; padding:22px; background:#006A4E; color:#fff; font:15px/1.55 Barlow,sans-serif; }
+      .d2r-changemaker-bio.is-open { display:block; }
       @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
+      @media(max-width:700px) { .d2r-changemakers-roster { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } #d2r-hero-brand { width:118px; right:16px; bottom:80px; opacity:.42; } }
     `;
     document.head.appendChild(style);
@@ -88,7 +123,7 @@ export default function HomepageFrame() {
     const brand = document.createElement("div");
     brand.id = "d2r-hero-brand";
     brand.setAttribute("aria-label", "The Dignity to Rise Movement");
-    brand.innerHTML = '<img src="/brand/dignity-to-rise-logo.png" alt="The Dignity to Rise Movement">';
+    brand.innerHTML = '<img src="/brand/dignity-to-rise-logo-white.png" alt="The Dignity to Rise Movement">';
     hero.appendChild(brand);
   }
 
@@ -116,6 +151,25 @@ export default function HomepageFrame() {
       if (transparencyImage) {
         transparencyImage.setAttribute("src", "/sectors/community.jpg");
         transparencyImage.setAttribute("alt", "Community members joining hands together");
+      }
+      const changemakersHeading = Array.from(document.querySelectorAll("h2")).find((heading) => heading.textContent?.trim() === "Meet the Changemakers");
+      const changemakersSection = changemakersHeading?.closest("section");
+      if (changemakersSection && !changemakersSection.dataset.rosterAdded) {
+        changemakersSection.dataset.rosterAdded = "true";
+        Array.from(changemakersSection.children).filter((child) => !child.contains(changemakersHeading ?? null)).forEach((child) => { (child as HTMLElement).style.display = "none"; });
+        const roster = document.createElement("div");
+        roster.className = "d2r-changemakers-roster";
+        const bio = document.createElement("div");
+        bio.className = "d2r-changemaker-bio";
+        ["Sybil", "Ellie", "Heinrich", "Nox", "Mr Kosie"].forEach((name) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = name;
+          button.addEventListener("click", () => { bio.textContent = `${name}'s story will be added soon.`; bio.classList.add("is-open"); });
+          roster.appendChild(button);
+        });
+        roster.appendChild(bio);
+        changemakersSection.appendChild(roster);
       }
       setText("#hero h1", content.heroTitle);
       setText("#hero p", content.heroKicker);
@@ -186,13 +240,13 @@ export default function HomepageFrame() {
   }
 
   useEffect(() => {
-    const attachHomepageEnhancements = () => { connectParticipationLinks(); compactFooter(); polishHero(); applyManagedContent(); };
+    const attachHomepageEnhancements = () => { connectParticipationLinks(); connectNewsletterSignup(); compactFooter(); polishHero(); applyManagedContent(); };
     attachHomepageEnhancements();
     const timer = window.setInterval(attachHomepageEnhancements, 250);
     return () => window.clearInterval(timer);
   }, []);
 
   return <main className="bundled-homepage" style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh" }}>
-    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); polishHero(); applyManagedContent(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
+    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); polishHero(); applyManagedContent(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
   </main>;
 }
