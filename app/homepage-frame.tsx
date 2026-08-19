@@ -113,6 +113,7 @@ export default function HomepageFrame() {
       .d2r-changemakers-roster button:hover { background:#F8F5EF; }
       .d2r-changemaker-bio { grid-column:1/-1; display:none; padding:22px; background:#006A4E; color:#fff; font:15px/1.55 Barlow,sans-serif; }
       .d2r-changemaker-bio.is-open { display:block; }
+      #changemakers .d2r-cmcard { display:none !important; }
       @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
       @media(max-width:700px) { .d2r-changemakers-roster { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } #d2r-hero-brand { width:118px; right:16px; bottom:80px; opacity:.42; } }
@@ -152,7 +153,7 @@ export default function HomepageFrame() {
         transparencyImage.setAttribute("src", "/sectors/community.jpg");
         transparencyImage.setAttribute("alt", "Community members joining hands together");
       }
-      const changemakersHeading = Array.from(document.querySelectorAll("h2")).find((heading) => heading.textContent?.toLowerCase().includes("changemaker"));
+      const changemakersHeading = Array.from(document.querySelectorAll("h1, h2, h3")).find((heading) => heading.textContent?.toLowerCase().includes("changemaker"));
       const changemakersSection = changemakersHeading?.closest("section");
       if (changemakersSection && !changemakersSection.dataset.rosterAdded) {
         changemakersSection.dataset.rosterAdded = "true";
