@@ -43,12 +43,12 @@ export const defaultSiteContent: SiteContent = {
   impactHeading: "The movement in numbers",
   impactStats: [{ label: "Projects completed", value: "14" }, { label: "Jobs created", value: "76" }, { label: "People impacted", value: "8,950+" }, { label: "Meals provided", value: "127,000+" }, { label: "People upskilled", value: "1,240+" }, { label: "Businesses supported", value: "36" }],
   sectors: [
-    { title: "Agriculture & Food", live: "4", done: "2", future: "2", image: "/sectors/agriculture-food.jpg", liveProjects: ["Community growing hub", "Food skills workshops", "Local produce market", "Food garden support"], doneProjects: ["Seedling distribution pilot", "Harvest skills day"], futureProjects: ["Food preservation programme", "School garden network"] },
-    { title: "Construction", live: "3", done: "1", future: "2", image: "/sectors/construction.jpg", liveProjects: ["Work-readiness training", "Home repair referrals", "Local contractor network"], doneProjects: ["Safety skills workshop"], futureProjects: ["Apprenticeship pathway", "Community repair days"] },
-    { title: "Community", live: "5", done: "3", future: "2", image: "/sectors/community.jpg", liveProjects: ["Volunteer matching", "Neighbourhood clean-up", "Community listening circles", "Support referrals", "Local events calendar"], doneProjects: ["Community needs survey", "Volunteer welcome day", "Resource mapping"], futureProjects: ["Community leadership circle", "Youth action network"] },
-    { title: "Digital & Remote", live: "3", done: "1", future: "4", image: "/sectors/digital-remote.jpg", liveProjects: ["Digital access support", "Remote-work readiness", "Online skills referrals"], doneProjects: ["Digital basics workshop"], futureProjects: ["Shared work hub", "Device access programme", "Digital mentoring", "Remote job pathway"] },
-    { title: "Local Services", live: "4", done: "2", future: "2", image: "/sectors/local-services.jpg", liveProjects: ["Buy-local directory", "Small business referrals", "Service provider network", "Local skills exchange"], doneProjects: ["Business listening sessions", "Community market pilot"], futureProjects: ["Local procurement campaign", "Micro-business clinic"] },
-    { title: "Tourism", live: "2", done: "2", future: "3", image: "/sectors/tourism.jpg", liveProjects: ["Visitor welcome training", "Local guide referrals"], doneProjects: ["Tourism skills day", "Community route mapping"], futureProjects: ["Tourism mentorships", "Local experience directory", "Hospitality pathway"] }
+    { title: "Agriculture & Food", live: "1", done: "0", future: "1", image: "/sectors/agriculture-food.jpg", liveProjects: ["Central Growzone"], doneProjects: [], futureProjects: ["Community Growzone"] },
+    { title: "Construction", live: "0", done: "0", future: "1", image: "/sectors/construction.jpg", liveProjects: [], doneProjects: [], futureProjects: ["Small Business Hubs"] },
+    { title: "Community", live: "1", done: "0", future: "0", image: "/sectors/community.jpg", liveProjects: ["Feeding Co-ordination"], doneProjects: [], futureProjects: [] },
+    { title: "Digital & Remote", live: "3", done: "0", future: "0", image: "/sectors/digital-remote.jpg", liveProjects: ["Dignity to Rise Hub", "Little Black Book - NGOs", "Project Register & KPIs"], doneProjects: [], futureProjects: [] },
+    { title: "Local Services", live: "0", done: "0", future: "0", image: "/sectors/local-services.jpg", liveProjects: [], doneProjects: [], futureProjects: [] },
+    { title: "Tourism", live: "1", done: "0", future: "0", image: "/sectors/tourism.jpg", liveProjects: ["Hermanus Passport"], doneProjects: [], futureProjects: [] }
   ]
 };
 
