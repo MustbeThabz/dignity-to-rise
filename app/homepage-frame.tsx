@@ -94,6 +94,18 @@ export default function HomepageFrame() {
     // Remove the optional hero watermark from any earlier render as well.
     // This keeps the hero clear across refreshes and hot reloads.
     document.getElementById("d2r-hero-brand")?.remove();
+    const removeLowerHeroLogos = () => {
+      if (!hero) return;
+      hero.querySelectorAll("img").forEach((image) => {
+        if (image.closest("#d2r-nav")) return;
+        const bounds = image.getBoundingClientRect();
+        const isBottomRightMark = bounds.left > window.innerWidth * 0.7 && bounds.top > window.innerHeight * 0.55;
+        if (isBottomRightMark) image.remove();
+      });
+    };
+    removeLowerHeroLogos();
+    const observer = new MutationObserver(removeLowerHeroLogos);
+    observer.observe(hero ?? document.body, { childList: true, subtree: true });
     if (document.getElementById("d2r-hero-polish")) return;
     const style = document.createElement("style");
     style.id = "d2r-hero-polish";
