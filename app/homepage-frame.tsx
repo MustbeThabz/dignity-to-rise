@@ -91,14 +91,15 @@ export default function HomepageFrame() {
     if (!document) return;
     const hero = document.getElementById("top");
     hero?.querySelectorAll("image-slot:not(#hero-bg)").forEach((element) => { (element as HTMLElement).style.display = "none"; });
+    // Remove the optional hero watermark from any earlier render as well.
+    // This keeps the hero clear across refreshes and hot reloads.
+    document.getElementById("d2r-hero-brand")?.remove();
     if (document.getElementById("d2r-hero-polish")) return;
     const style = document.createElement("style");
     style.id = "d2r-hero-polish";
     style.textContent = `
       #top { height: 100svh !important; min-height: 700px !important; }
       #hero-bg { transform: scale(1.08); transform-origin: center; filter: saturate(1.04) contrast(1.03); }
-      #d2r-hero-brand { position:absolute; z-index:6; right:clamp(22px,3vw,56px); bottom:clamp(74px,10vh,116px); width:clamp(118px,10vw,176px); pointer-events:none; opacity:.72; }
-      #d2r-hero-brand img { display:block; width:100%; height:auto; filter:brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.42)); }
       #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
       #d2r-sector-projects.is-open { display:flex; }
       .d2r-sector-dialog { position:relative; width:min(760px,100%); max-height:min(82vh,760px); overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; color:#1A1A1A; box-shadow:0 28px 90px rgba(0,0,0,.38); }
@@ -119,15 +120,9 @@ export default function HomepageFrame() {
       #changemakers .d2r-cmcard { display:none !important; }
       @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
       @media(max-width:700px) { .d2r-changemakers-roster { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-      @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } #d2r-hero-brand { width:118px; right:16px; bottom:80px; opacity:.42; } }
+      @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } }
     `;
     document.head.appendChild(style);
-    if (!hero) return;
-    const brand = document.createElement("div");
-    brand.id = "d2r-hero-brand";
-    brand.setAttribute("aria-label", "The Dignity to Rise Movement");
-    brand.innerHTML = '<img src="/brand/dignity-to-rise-flower-watermark.png" alt="The Dignity to Rise Movement">';
-    hero.appendChild(brand);
   }
 
   async function applyManagedContent() {
