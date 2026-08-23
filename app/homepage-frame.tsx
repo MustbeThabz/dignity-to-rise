@@ -112,6 +112,9 @@ export default function HomepageFrame() {
     style.textContent = `
       #top { height: 100svh !important; min-height: 700px !important; }
       #hero-bg { transform: scale(1.08); transform-origin: center; filter: saturate(1.04) contrast(1.03); }
+      /* The hero contains only its landscape and the navigation logo. */
+      #top > :not(#hero-bg):not(#d2r-nav) img { display:none !important; }
+      #top > :not(#hero-bg):not(#d2r-nav) image-slot { display:none !important; }
       #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
       #d2r-sector-projects.is-open { display:flex; }
       .d2r-sector-dialog { position:relative; width:min(760px,100%); max-height:min(82vh,760px); overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; color:#1A1A1A; box-shadow:0 28px 90px rgba(0,0,0,.38); }
