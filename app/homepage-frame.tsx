@@ -127,10 +127,11 @@ export default function HomepageFrame() {
       .d2r-sector-dialog ul { margin:0; padding:0; list-style:none; }
       .d2r-sector-dialog li { padding:9px 0; border-top:1px solid #EEE8DD; color:#514E48; font:14px/1.35 Barlow,sans-serif; }
       .d2r-sector-dialog li:first-child { border-top:0; }
-      .d2r-changemakers-roster { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin:32px auto 0; max-width:1120px; }
-      .d2r-changemakers-roster button { min-height:112px; border:1px solid #D8B872; background:#fff; color:#006A4E; padding:18px; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; }
+      .d2r-changemakers-roster { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:32px auto 0; max-width:1120px; }
+      .d2r-changemakers-roster button { min-height:112px; overflow:hidden; border:1px solid #D8B872; background:#fff; color:#006A4E; padding:0 0 18px; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; }
+      .d2r-changemakers-roster button img { display:block; width:100%; height:144px; margin:0 0 14px; object-fit:cover; object-position:center; }
       .d2r-changemakers-roster button:hover { background:#F8F5EF; }
-      .d2r-changemaker-bio { grid-column:1/-1; display:none; padding:22px; background:#006A4E; color:#fff; font:15px/1.55 Barlow,sans-serif; }
+      .d2r-changemaker-bio { grid-column:1/-1; display:none; padding:28px; background:#006A4E; color:#fff; font:15px/1.65 Barlow,sans-serif; white-space:pre-line; }
       .d2r-changemaker-bio.is-open { display:block; }
       #changemakers .d2r-cmcard { display:none !important; }
       @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
@@ -149,9 +150,17 @@ export default function HomepageFrame() {
       const setText = (selector: string, value: string) => { const element = document.querySelector(selector); if (element && value) element.textContent = value; };
       const background = document.getElementById("hero-bg");
       if (background && content.heroImage) background.setAttribute("src", content.heroImage);
-      ["team-ellie", "team-sybil"].forEach((id) => {
+      const teamPhotos = [
+        { id: "team-ellie", src: "/team/ellie.jpeg", alt: "Ellie" },
+        { id: "team-sybil", src: "/team/sybil.jpg", alt: "Sybil" }
+      ];
+      teamPhotos.forEach(({ id, src, alt }) => {
         const photo = document.getElementById(id);
-        if (photo) photo.style.display = "none";
+        if (photo) {
+          photo.style.display = "block";
+          photo.setAttribute("src", src);
+          photo.setAttribute("alt", alt);
+        }
       });
       ["/social/community-market.jpg", "/social/digital-hub.jpg", "/social/hermanus-landscape.jpg"].forEach((source, index) => {
         const reel = document.getElementById(`social-${index + 1}`);
@@ -175,11 +184,33 @@ export default function HomepageFrame() {
         roster.className = "d2r-changemakers-roster";
         const bio = document.createElement("div");
         bio.className = "d2r-changemaker-bio";
-        ["Sybil", "Ellie", "Heinrich", "Nox", "Mr Kosie"].forEach((name) => {
+        const changemakers = [
+          { name: "Sybil", photo: "/team/sybil.jpg" },
+          { name: "Ellie", photo: "/team/ellie.jpeg" },
+          { name: "Heinrich", photo: "/team/photo-2026-05-27-08-35-19.jpg" },
+          { name: "Noxolo Liwani" },
+          { name: "Xolile Joseph Kosi" },
+          { name: "Elmarie Meyer" }
+        ];
+        const biographies: Record<string, string> = {
+          "Sybil": "Sybil Doms Pretorius is a South African entrepreneur, business leader and problem-solver whose career has crossed culinary, hospitality, events, technology, recruitment, business analytics and financial crime compliance. With more than 20 years of diverse experience, she has built her career around connecting people, ideas and opportunities and turning complexity into practical solutions. Today, as COO and co-founder of RAHN Consolidated, she works across technology, AI, process optimisation, specialist recruitment and financial crime solutions, with a particular passion for using business and technology to create meaningful change.\n\nBut Sybil’s drive extends beyond business. Dignity to Rise reflects her belief that sustainable change happens when people, businesses, communities and government are connected and given the opportunity to work together. Rather than simply giving, she wants to build systems, projects and partnerships that create opportunity, dignity, accountability and long-term independence. Her motivation is simple: to connect the right people and resources so that communities can build better futures for themselves.",
+          "Noxolo Liwani": "Noxolo Liwani is the Local Economic Development Officer and EPWP Champion within the Socio-Economic Services section of Overstrand Municipality's Planning and Development Directorate. In this role, she drives local economic development, enterprise support and skills development initiatives across the Overstrand region, working closely with community entrepreneurs, cooperatives and small businesses to unlock sustainable economic opportunities.\n\nNoxolo manages key municipal partnerships with organisations such as ABSA, the Grootbos Foundation, TechWays Foundation and the Department of Economic Development and Tourism, coordinating enterprise-development workshops, employability programmes and stakeholder engagements throughout the region. She also oversees municipal EPWP reporting and recruitment processes, and has led operational projects including the Multi-Purpose Centre at Old Harbour, Hermanus, and the management of municipal trading-stall infrastructure.\n\nKnown for her hands-on, community-focused approach, Noxolo is committed to building strong public private partnerships that create real, measurable economic impact for residents across the Overstrand municipal area.",
+          "Xolile Joseph Kosi": "Xolile Joseph Kosi is a strategic leader, economic development practitioner and community activist who is deeply passionate about unlocking human and economic potential. His professional journey has taken him across local government, business, civil society, education and community development, giving him a broad understanding of the forces that shape inclusive development. He has led initiatives supporting entrepreneurs, SMMEs, job creation, transformation and partnerships between public and private-sector stakeholders.\n\nAt the heart of Xolile’s work is a simple conviction: development happens when people are mobilised to act. He seeks to bring together activists and champions from government, business, civil society and communities to create an economy that is more inclusive, participatory and opportunity-driven. His international outlook is equally strong. He believes South Africa is not isolated from the world but an integral part of the global village, and that South Africans have a responsibility to participate, innovate and contribute to shaping a better global future.",
+          "Heinrich": "Heinrich Ungerer is the founder and director of the Food Security Program (FSP), where he has spent more than a decade developing practical, scalable food-production models that connect agriculture, enterprise and measurable impact. His work focuses on building productive systems that create long-term value improving access to nutritious food while creating jobs, skills, income opportunities and stronger local food economies. Heinrich is an entrepreneur at heart, with a passion for building practical solutions, bringing people and ideas together, and creating opportunities where good business and positive impact can grow side by side.",
+          "Ellie": "Biography coming soon.",
+          "Elmarie Meyer": "Biography coming soon."
+        };
+        changemakers.forEach(({ name, photo }) => {
           const button = document.createElement("button");
           button.type = "button";
-          button.textContent = name;
-          button.addEventListener("click", () => { bio.textContent = `${name}'s story will be added soon.`; bio.classList.add("is-open"); });
+          if (photo) {
+            const image = document.createElement("img");
+            image.src = photo;
+            image.alt = name;
+            button.appendChild(image);
+          }
+          button.append(name);
+          button.addEventListener("click", () => { bio.textContent = biographies[name] ?? "Biography coming soon."; bio.classList.add("is-open"); });
           roster.appendChild(button);
         });
         roster.appendChild(bio);
