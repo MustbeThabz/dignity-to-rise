@@ -161,8 +161,8 @@ export default function HomepageFrame() {
       const background = document.getElementById("hero-bg");
       if (background && content.heroImage) background.setAttribute("src", content.heroImage);
       const teamPhotos = [
-        { id: "team-ellie", src: "/team/ellie.jpeg", alt: "Ellie" },
-        { id: "team-sybil", src: "/team/sybil.jpg", alt: "Sybil" }
+        { id: "team-ellie", src: "/team/elmarie-meyer.png", alt: "Elmarie Meyer" },
+        { id: "team-sybil", src: "/team/sybil-doms-pretorius.jpg", alt: "Sybil Doms Pretorius" }
       ];
       teamPhotos.forEach(({ id, src, alt }) => {
         const photo = document.getElementById(id);
@@ -172,6 +172,8 @@ export default function HomepageFrame() {
           photo.setAttribute("alt", alt);
         }
       });
+      const elmarieName = document.getElementById("team-ellie")?.closest("a")?.querySelector(":scope > div > div");
+      if (elmarieName) elmarieName.textContent = "Elmarie Meyer";
       ["/social/community-market.jpg", "/social/digital-hub.jpg", "/social/hermanus-landscape.jpg"].forEach((source, index) => {
         const reel = document.getElementById(`social-${index + 1}`);
         if (reel) reel.setAttribute("src", source);
@@ -196,10 +198,10 @@ export default function HomepageFrame() {
         track.className = "d2r-changemakers-track";
         track.setAttribute("aria-label", "Changemakers");
         const changemakers = [
-          { name: "Sybil Doms Pretorius", role: "Project Director", photo: "/team/sybil-doms-pretorius.jpg" },
-          { name: "Elmarie Meyer", role: "Programme Director", photo: "/team/elmarie-meyer.png" },
-          { name: "Noxolo Liwani", role: "Local Economic Development Officer", photo: "/team/noxolo-liwani.jpeg" },
-          { name: "Xolile Joseph Kosi", role: "Economic Development Practitioner", photo: "/team/xolile-joseph-kosi.jpeg" },
+          { name: "Sybil Doms Pretorius", role: "Dignity to Rise", photo: "/team/sybil-doms-pretorius.jpg" },
+          { name: "Elmarie Meyer", role: "Dignity to Rise", photo: "/team/elmarie-meyer.png" },
+          { name: "Noxolo Liwani", role: "Overstrand Municipality", photo: "/team/noxolo-liwani.jpeg" },
+          { name: "Xolile Joseph Kosi", role: "Overstrand Municipality", photo: "/team/xolile-joseph-kosi.jpeg" },
           { name: "Heinrich Ungerer", role: "Founder & Director, Food Security Program", photo: "/team/heinrich-ungerer.png" }
         ];
         const biographies: Record<string, string> = {
