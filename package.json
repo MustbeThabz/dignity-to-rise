@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/pdfkit": "^0.17.6",
     "bootstrap": "^5.3.3",
+    "exceljs": "^4.4.0",
     "googleapis": "^144.0.0",
     "mongodb": "^6.8.0",
     "next": "^14.2.12",
+    "pdfkit": "^0.20.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zod": "^3.23.8"
