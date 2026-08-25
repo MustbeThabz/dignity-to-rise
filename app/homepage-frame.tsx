@@ -130,10 +130,12 @@ export default function HomepageFrame() {
       .d2r-changemakers-roster { position:relative; margin:32px auto 0; max-width:1240px; padding:0 54px; }
       .d2r-changemakers-track { display:flex; gap:clamp(22px,4vw,58px); overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth; scrollbar-width:none; padding:4px 0 12px; }
       .d2r-changemakers-track::-webkit-scrollbar { display:none; }
+      .d2r-sectors-grid { gap:0 !important; background:transparent !important; }
       .d2r-changemakers-roster button { flex:0 0 156px; scroll-snap-align:start; overflow:visible; border:0; background:transparent; color:#006A4E; padding:0; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; text-align:center; }
       .d2r-changemakers-roster button img { display:block; width:150px; height:150px; margin:0 auto 15px; border-radius:50%; object-fit:cover; object-position:center; filter:sepia(.28) saturate(.7) brightness(1.08); transition:filter .25s ease, transform .25s ease; }
       .d2r-changemakers-roster button:hover img, .d2r-changemakers-roster button:focus-visible img { filter:sepia(.12) saturate(.88); transform:scale(1.035); }
       .d2r-changemakers-roster button small { display:block; margin-top:6px; color:#9A715C; font:500 11px/1.25 Barlow,sans-serif; letter-spacing:.02em; }
+      .d2r-changemakers-roster button small.company { margin-top:2px; color:#006A4E; font-weight:600; }
       .d2r-changemaker-arrow { position:absolute; top:50px; z-index:1; width:42px; height:42px; border:1px solid #D8C7AC; border-radius:50%; background:#fff; color:#006A4E; font:28px/1 Barlow,sans-serif; cursor:pointer; }
       .d2r-changemaker-arrow.prev { left:0; }.d2r-changemaker-arrow.next { right:0; }
       .d2r-changemaker-dialog { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,42,31,.68); }
@@ -198,11 +200,11 @@ export default function HomepageFrame() {
         track.className = "d2r-changemakers-track";
         track.setAttribute("aria-label", "Changemakers");
         const changemakers = [
-          { name: "Sybil Doms Pretorius", role: "Dignity to Rise", photo: "/team/sybil-doms-pretorius.jpg" },
-          { name: "Elmarie Meyer", role: "Dignity to Rise", photo: "/team/elmarie-meyer.png" },
-          { name: "Noxolo Liwani", role: "Overstrand Municipality", photo: "/team/noxolo-liwani.jpeg" },
-          { name: "Xolile Joseph Kosi", role: "Overstrand Municipality", photo: "/team/xolile-joseph-kosi.jpeg" },
-          { name: "Heinrich Ungerer", role: "Founder & Director, Food Security Program", photo: "/team/heinrich-ungerer.png" }
+          { name: "Sybil Doms Pretorius", role: "Project Director", company: "Dignity to Rise", photo: "/team/sybil-doms-pretorius.jpg" },
+          { name: "Elmarie Meyer", role: "Programme Director", company: "Dignity to Rise", photo: "/team/elmarie-meyer.png" },
+          { name: "Noxolo Liwani", role: "Local Economic Development Officer", company: "Overstrand Municipality", photo: "/team/noxolo-liwani.jpeg" },
+          { name: "Xolile Joseph Kosi", role: "Economic Development Practitioner", company: "Overstrand Municipality", photo: "/team/xolile-joseph-kosi.jpeg" },
+          { name: "Heinrich Ungerer", role: "Founder & Director", company: "Food Security Program", photo: "/team/heinrich-ungerer.png" }
         ];
         const biographies: Record<string, string> = {
           "Sybil Doms Pretorius": "Sybil Doms Pretorius is a South African entrepreneur, business leader and problem-solver whose career has crossed culinary, hospitality, events, technology, recruitment, business analytics and financial crime compliance. With more than 20 years of diverse experience, she has built her career around connecting people, ideas and opportunities and turning complexity into practical solutions. Today, as COO and co-founder of RAHN Consolidated, she works across technology, AI, process optimisation, specialist recruitment and financial crime solutions, with a particular passion for using business and technology to create meaningful change.\n\nBut Sybil’s drive extends beyond business. Dignity to Rise reflects her belief that sustainable change happens when people, businesses, communities and government are connected and given the opportunity to work together. Rather than simply giving, she wants to build systems, projects and partnerships that create opportunity, dignity, accountability and long-term independence. Her motivation is simple: to connect the right people and resources so that communities can build better futures for themselves.",
@@ -220,7 +222,7 @@ export default function HomepageFrame() {
         dialog.querySelector("button")?.addEventListener("click", closeDialog);
         dialog.addEventListener("click", (event) => { if (event.target === dialog) closeDialog(); });
         document.body.appendChild(dialog);
-        changemakers.forEach(({ name, role, photo }) => {
+        changemakers.forEach(({ name, role, company, photo }) => {
           const button = document.createElement("button");
           button.type = "button";
           button.setAttribute("aria-label", `Read ${name}'s biography`);
@@ -231,10 +233,13 @@ export default function HomepageFrame() {
           title.textContent = name;
           const label = document.createElement("small");
           label.textContent = role;
-          button.append(image, title, label);
+          const companyLabel = document.createElement("small");
+          companyLabel.className = "company";
+          companyLabel.textContent = company;
+          button.append(image, title, label, companyLabel);
           button.addEventListener("click", () => {
             (dialog.querySelector("h2") as HTMLElement).textContent = name;
-            (dialog.querySelector("h2 + p") as HTMLElement).textContent = role;
+            (dialog.querySelector("h2 + p") as HTMLElement).textContent = `${role} · ${company}`;
             (dialog.querySelector(".bio-copy") as HTMLElement).textContent = biographies[name] ?? "Biography coming soon.";
             dialog.classList.add("is-open");
           });
