@@ -131,6 +131,7 @@ export default function HomepageFrame() {
       .d2r-changemakers-track { display:flex; gap:clamp(22px,4vw,58px); overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth; scrollbar-width:none; padding:4px 0 12px; }
       .d2r-changemakers-track::-webkit-scrollbar { display:none; }
       .d2r-sectors-grid { gap:0 !important; background:transparent !important; }
+      #sectors .d2r-sectors-grid > a > image-slot, #sectors .d2r-sectors-grid > a > image-slot img { display:block !important; width:100% !important; height:100% !important; object-fit:cover !important; }
       .d2r-changemakers-roster button { flex:0 0 156px; scroll-snap-align:start; overflow:visible; border:0; background:transparent; color:#006A4E; padding:0; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; text-align:center; }
       .d2r-changemakers-roster button img { display:block; width:150px; height:150px; margin:0 auto 15px; border-radius:50%; object-fit:cover; object-position:center; filter:sepia(.28) saturate(.7) brightness(1.08); transition:filter .25s ease, transform .25s ease; }
       .d2r-changemakers-roster button:hover img, .d2r-changemakers-roster button:focus-visible img { filter:sepia(.12) saturate(.88); transform:scale(1.035); }
@@ -157,6 +158,54 @@ export default function HomepageFrame() {
     const document = frameRef.current?.contentDocument;
     if (!document || document.documentElement.dataset.managedContentConnected) return;
     document.documentElement.dataset.managedContentConnected = "true";
+    // The sector cards use “Live”; use the same status language on the opportunity cards.
+    document.querySelectorAll("#d2r-opp-carousel .d2r-card").forEach((card) => {
+      const activeStatus = Array.from(card.querySelectorAll("div")).find((element) => element.textContent?.trim() === "Active");
+      activeStatus?.childNodes.forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE) node.textContent = "Live";
+      });
+    });
+    const opportunityCarousel = document.getElementById("d2r-opp-carousel");
+    if (opportunityCarousel && !opportunityCarousel.dataset.contentUpdated) {
+      opportunityCarousel.dataset.contentUpdated = "true";
+      const cards = Array.from(opportunityCarousel.querySelectorAll(":scope > .d2r-card")) as HTMLElement[];
+      const updateCard = (card: HTMLElement | undefined, details: { category: string; title: string; status: string; statusColor: string; image: string; imageDescription: string }) => {
+        if (!card) return;
+        const image = card.querySelector("image-slot");
+        if (image) {
+          image.setAttribute("src", details.image);
+          image.setAttribute("placeholder", details.imageDescription);
+        }
+        const content = card.querySelector(":scope > div");
+        const [category, title, status] = Array.from(content?.children ?? []) as HTMLElement[];
+        if (category) category.textContent = details.category;
+        if (title) title.textContent = details.title;
+        if (status) {
+          const dot = (status.querySelector("span") as HTMLElement | null) ?? document.createElement("span");
+          dot.style.cssText = `width:7px;height:7px;border-radius:50%;background:${details.statusColor};`;
+          status.replaceChildren(dot, document.createTextNode(details.status));
+        }
+      };
+
+      updateCard(cards[0], {
+        category: "Construction",
+        title: "Community Business Hubs",
+        status: "Planning",
+        statusColor: "#AFCEDB",
+        image: "/sectors/construction.jpg",
+        imageDescription: "Construction workers planning a community business hub"
+      });
+      updateCard(cards[3], {
+        category: "Digital & Remote Work",
+        title: "Little Black Book - Community Organisations",
+        status: "Live",
+        statusColor: "#006A4E",
+        image: "/sectors/digital-remote.jpg",
+        imageDescription: "A person working remotely on a community organisations directory"
+      });
+
+      [cards[0], cards[3], cards[1], cards[2], cards[4]].filter((card): card is HTMLElement => Boolean(card)).forEach((card) => opportunityCarousel.append(card));
+    }
     try {
       const content = await fetch("/api/site-content", { cache: "no-store" }).then((response) => response.json());
       const setText = (selector: string, value: string) => { const element = document.querySelector(selector); if (element && value) element.textContent = value; };
@@ -277,11 +326,27 @@ export default function HomepageFrame() {
         if (elements[1]) elements[1].textContent = stat.label;
       });
       const sectorTiles = Array.from(document.querySelectorAll("#sectors .d2r-sectors-grid > a"));
+      const sectorImageOverrides = [
+        { source: "/sectors/agriculture-food-tile.jpg", position: "center" },
+        { source: "/sectors/construction-tile.jpg", position: "center" },
+        { source: "/sectors/community-tile.jpg", position: "center" },
+        { source: "/sectors/digital-remote-tile.jpg", position: "68% center" },
+        { source: "/sectors/local-services-tile.jpg", position: "40% center" },
+        { source: "/sectors/tourism-tile.jpg", position: "center" }
+      ];
       content.sectors?.forEach((sector: { title: string; live: string; done: string; future: string; image: string; liveProjects: string[]; doneProjects: string[]; futureProjects: string[] }, index: number) => {
         const tile = sectorTiles[index] as HTMLAnchorElement | undefined;
         if (!tile) return;
         const image = tile.querySelector("image-slot");
-        if (image) image.setAttribute("src", sector.image);
+        const imageOverride = sectorImageOverrides[index];
+        if (image) {
+          image.setAttribute("src", imageOverride?.source ?? sector.image);
+          image.setAttribute("fit", "cover");
+          const imageElement = image as HTMLElement;
+          imageElement.style.objectFit = "cover";
+          imageElement.style.objectPosition = imageOverride?.position ?? "center";
+          imageElement.style.filter = "saturate(1.08) contrast(1.08)";
+        }
         const title = tile.querySelector("h3");
         if (title) title.textContent = sector.title;
         const stats = title?.nextElementSibling;

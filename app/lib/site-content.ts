@@ -43,12 +43,12 @@ export const defaultSiteContent: SiteContent = {
   impactHeading: "The movement in numbers",
   impactStats: [{ label: "Projects completed", value: "0" }, { label: "Jobs created", value: "0" }, { label: "People impacted", value: "0" }, { label: "Meals provided", value: "0" }, { label: "People upskilled", value: "0" }, { label: "Businesses supported", value: "0" }],
   sectors: [
-    { title: "Agriculture & Food", live: "1", done: "0", future: "1", image: "/sectors/agriculture-food.jpg", liveProjects: ["Central Growzone"], doneProjects: [], futureProjects: ["Community Growzone"] },
-    { title: "Construction", live: "0", done: "0", future: "1", image: "/sectors/construction.jpg", liveProjects: [], doneProjects: [], futureProjects: ["Small Business Hubs"] },
-    { title: "Community", live: "1", done: "0", future: "0", image: "/sectors/community.jpg", liveProjects: ["Feeding Co-ordination"], doneProjects: [], futureProjects: [] },
-    { title: "Digital & Remote", live: "3", done: "0", future: "0", image: "/sectors/digital-remote.jpg", liveProjects: ["Dignity to Rise Hub", "Little Black Book - NGOs", "Project Register & KPIs"], doneProjects: [], futureProjects: [] },
-    { title: "Local Services", live: "0", done: "0", future: "0", image: "/sectors/local-services.jpg", liveProjects: [], doneProjects: [], futureProjects: [] },
-    { title: "Tourism", live: "1", done: "0", future: "0", image: "/sectors/tourism.jpg", liveProjects: ["Hermanus Passport"], doneProjects: [], futureProjects: [] }
+    { title: "Agriculture & Food", live: "1", done: "0", future: "1", image: "/sectors/agriculture-food-tile.jpg", liveProjects: ["Central Growzone"], doneProjects: [], futureProjects: ["Community Growzone"] },
+    { title: "Construction", live: "0", done: "0", future: "1", image: "/sectors/construction-tile.jpg", liveProjects: [], doneProjects: [], futureProjects: ["Community Business Hubs"] },
+    { title: "Community", live: "1", done: "0", future: "0", image: "/sectors/community-tile.jpg", liveProjects: ["Feeding Co-ordination"], doneProjects: [], futureProjects: [] },
+    { title: "Digital & Remote", live: "3", done: "0", future: "0", image: "/sectors/digital-remote-tile.jpg", liveProjects: ["Dignity to Rise Hub", "Little Black Book - Community Organisations", "Project Register & KPIs"], doneProjects: [], futureProjects: [] },
+    { title: "Local Services", live: "0", done: "0", future: "0", image: "/sectors/local-services-tile.jpg", liveProjects: [], doneProjects: [], futureProjects: [] },
+    { title: "Tourism", live: "1", done: "0", future: "0", image: "/sectors/tourism-tile.jpg", liveProjects: ["Hermanus Passport"], doneProjects: [], futureProjects: [] }
   ]
 };
 
