@@ -1,12 +1,27 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { ProjectStatus, SectorCard, SectorProject, SiteContent } from "./lib/site-content";
 
 const destinations: Record<string, string> = {
   "PARTNER WITH US": "/partner",
   "SUPPORT PROJECTS": "/fund",
   "BECOME A MENTOR": "/mentor"
 };
+
+const facebookUrl = "https://www.facebook.com/thedignitytorisemovement";
+const instagramUrl = "https://www.instagram.com/dignitytorise/";
+
+// The bundled homepage has legacy impact labels. Apply the current card order
+// immediately; the volunteer value is then replaced by the live database count.
+const homepageImpactFallback: SiteContent["impactStats"] = [
+  { key: "projects-started", label: "Projects started", value: "6" },
+  { key: "jobs-created", label: "Jobs created", value: "1" },
+  { key: "people-upskilled", label: "People upskilled", value: "2" },
+  { key: "ngos-contacted", label: "NGOs contacted", value: "-" },
+  { key: "volunteers-registered", label: "Volunteers registered", value: "21" },
+  { key: "projects-in-planning", label: "Projects in planning", value: "8" }
+];
 
 export default function HomepageFrame() {
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -117,24 +132,50 @@ export default function HomepageFrame() {
       #top > :not(#hero-bg):not(#d2r-nav) image-slot { display:none !important; }
       #d2r-sector-projects { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:22px; background:rgba(0,35,26,.72); }
       #d2r-sector-projects.is-open { display:flex; }
-      .d2r-sector-dialog { position:relative; width:min(760px,100%); max-height:min(82vh,760px); overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; color:#1A1A1A; box-shadow:0 28px 90px rgba(0,0,0,.38); }
+      .d2r-sector-dialog { position:relative; width:min(940px,100%); max-height:min(82vh,760px); overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; color:#1A1A1A; box-shadow:0 28px 90px rgba(0,0,0,.38); }
       .d2r-sector-dialog > button { position:absolute; top:16px; right:16px; border:1px solid #006A4E; background:transparent; color:#006A4E; padding:9px 12px; font:600 11px Barlow,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
       .d2r-sector-dialog > p { margin:0 0 8px; color:#B89454; font:600 11px Barlow,sans-serif; letter-spacing:.18em; text-transform:uppercase; }
-      .d2r-sector-dialog > h2 { margin:0 0 26px; color:#006A4E; font:600 clamp(34px,5vw,52px)/1 Cormorant Garamond,serif; }
-      .d2r-sector-dialog > div { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
-      .d2r-sector-dialog section { padding:18px; border:1px solid #E0D8C9; background:#fff; }
-      .d2r-sector-dialog h3 { margin:0 0 12px; color:#006A4E; font:600 13px Barlow,sans-serif; letter-spacing:.09em; text-transform:uppercase; }
-      .d2r-sector-dialog ul { margin:0; padding:0; list-style:none; }
-      .d2r-sector-dialog li { padding:9px 0; border-top:1px solid #EEE8DD; color:#514E48; font:14px/1.35 Barlow,sans-serif; }
-      .d2r-sector-dialog li:first-child { border-top:0; }
-      .d2r-changemakers-roster { position:relative; margin:32px auto 0; max-width:1240px; padding:0 54px; }
+      .d2r-sector-dialog > h2 { margin:0 74px 28px 0; color:#006A4E; font:600 clamp(34px,5vw,52px)/1 Cormorant Garamond,serif; }
+      .d2r-sector-project-content { display:grid; gap:26px; }
+      .d2r-project-group { padding:0; border:0; background:transparent; }
+      .d2r-project-group > h3 { margin:0 0 12px; color:#006A4E; font:600 13px Barlow,sans-serif; letter-spacing:.09em; text-transform:uppercase; }
+      .d2r-project-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+      .d2r-project-card { display:flex; flex-direction:column; gap:16px; min-width:0; padding:18px; border:1px solid #E0D8C9; background:#fff; }
+      .d2r-project-header { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+      .d2r-project-header h4 { margin:0; color:#006A4E; font:600 25px/1.05 Cormorant Garamond,serif; }
+      .d2r-project-meta { display:flex; flex:0 0 auto; flex-wrap:wrap; justify-content:flex-end; gap:6px; }
+      .d2r-project-meta span { display:inline-flex; align-items:center; min-height:24px; padding:4px 7px; border:1px solid #D8C7AC; color:#62594D; font:600 10px/1 Barlow,sans-serif; letter-spacing:.07em; text-transform:uppercase; }
+      .d2r-project-meta .d2r-project-status--live { border-color:#006A4E; background:#EAF4EF; color:#006A4E; }
+      .d2r-project-meta .d2r-project-status--planning { border-color:#B89454; background:#FBF3E4; color:#805B21; }
+      .d2r-project-meta .d2r-project-status--complete { border-color:#527B6B; background:#EAF0ED; color:#285B49; }
+      .d2r-project-meta .d2r-project-status--future { border-color:#8CAFC0; background:#EDF5F8; color:#3D7086; }
+      .d2r-project-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 20px; margin:0; }
+      .d2r-project-details > div { min-width:0; }
+      .d2r-project-details > div.is-notes { grid-column:1 / -1; }
+      .d2r-project-details dt { margin:0 0 5px; color:#9A715C; font:600 10px/1.2 Barlow,sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+       .d2r-project-details dd { margin:0; color:#514E48; font:14px/1.5 Barlow,sans-serif; overflow-wrap:anywhere; white-space:pre-wrap; }
+       .d2r-changemaker-feature { display:grid; grid-template-columns:minmax(280px,.94fr) minmax(0,1.06fr); gap:clamp(30px,5vw,76px); width:min(100% - 40px,1180px); margin:0 auto; padding:clamp(26px,4vw,48px); background:#fff; box-shadow:0 18px 48px rgba(0,51,37,.08); }
+       .d2r-changemaker-feature-portrait { min-height:420px; margin:0; overflow:hidden; background:#E9E4DA; }
+       .d2r-changemaker-feature-portrait img { display:block; width:100%; height:100%; min-height:420px; object-fit:cover; object-position:center; filter:contrast(1.1) saturate(1.06); }
+       .d2r-changemaker-feature-copy { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:clamp(4px,2vw,18px) 0; }
+       .d2r-changemaker-feature-copy > p:first-child { margin:0 0 22px; color:#B89454; font:600 11px/1 Barlow,sans-serif; letter-spacing:.22em; text-transform:uppercase; }
+       .d2r-changemaker-feature-copy h2 { margin:0; color:#006A4E; font:500 clamp(42px,5vw,68px)/.98 Cormorant Garamond,serif; }
+       .d2r-changemaker-feature-role { margin:12px 0 0; color:#897C70; font:500 14px/1.45 Barlow,sans-serif; letter-spacing:.03em; }
+       .d2r-changemaker-feature-quote { margin:34px 0 0; color:#007457; font:italic clamp(28px,3vw,42px)/1.25 Cormorant Garamond,serif; }
+       .d2r-changemaker-feature-summary { max-width:560px; margin:28px 0 0; color:#5A5752; font:16px/1.72 Barlow,sans-serif; }
+       .d2r-changemaker-feature-actions { display:flex; flex-wrap:wrap; gap:14px 26px; margin-top:33px; }
+       .d2r-changemaker-feature-actions a { display:inline-flex; align-items:center; gap:10px; color:#006A4E; font:600 11px/1 Barlow,sans-serif; letter-spacing:.13em; text-decoration:none; text-transform:uppercase; }
+       .d2r-changemaker-feature-actions a:first-child { color:#B07F37; }
+       .d2r-changemaker-feature-actions a::after { content:"→"; font-size:17px; line-height:1; }
+       .d2r-changemaker-feature-actions a:hover,.d2r-changemaker-feature-actions a:focus-visible { color:#805B21; outline:none; }
+       .d2r-changemakers-roster { position:relative; margin:32px auto 0; max-width:1240px; padding:0 54px; }
       .d2r-changemakers-track { display:flex; gap:clamp(22px,4vw,58px); overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth; scrollbar-width:none; padding:4px 0 12px; }
       .d2r-changemakers-track::-webkit-scrollbar { display:none; }
       .d2r-sectors-grid { gap:0 !important; background:transparent !important; }
       #sectors .d2r-sectors-grid > a > image-slot, #sectors .d2r-sectors-grid > a > image-slot img { display:block !important; width:100% !important; height:100% !important; object-fit:cover !important; }
       .d2r-changemakers-roster button { flex:0 0 156px; scroll-snap-align:start; overflow:visible; border:0; background:transparent; color:#006A4E; padding:0; font:600 20px/1.1 Cormorant Garamond,serif; cursor:pointer; text-align:center; }
-      .d2r-changemakers-roster button img { display:block; width:150px; height:150px; margin:0 auto 15px; border-radius:50%; object-fit:cover; object-position:center; filter:sepia(.28) saturate(.7) brightness(1.08); transition:filter .25s ease, transform .25s ease; }
-      .d2r-changemakers-roster button:hover img, .d2r-changemakers-roster button:focus-visible img { filter:sepia(.12) saturate(.88); transform:scale(1.035); }
+       .d2r-changemakers-roster button img { display:block; width:150px; height:150px; margin:0 auto 15px; border-radius:50%; object-fit:cover; object-position:center; filter:contrast(1.07) saturate(1.04); transition:filter .25s ease, transform .25s ease; }
+       .d2r-changemakers-roster button:hover img, .d2r-changemakers-roster button:focus-visible img { filter:contrast(1.1) saturate(1.07); transform:scale(1.035); }
       .d2r-changemakers-roster button small { display:block; margin-top:6px; color:#9A715C; font:500 11px/1.25 Barlow,sans-serif; letter-spacing:.02em; }
       .d2r-changemakers-roster button small.company { margin-top:2px; color:#006A4E; font-weight:600; }
       .d2r-changemaker-arrow { position:absolute; top:50px; z-index:1; width:42px; height:42px; border:1px solid #D8C7AC; border-radius:50%; background:#fff; color:#006A4E; font:28px/1 Barlow,sans-serif; cursor:pointer; }
@@ -143,21 +184,99 @@ export default function HomepageFrame() {
       .d2r-changemaker-dialog.is-open { display:flex; }
       .d2r-changemaker-dialog > div { position:relative; width:min(710px,100%); max-height:82vh; overflow:auto; padding:clamp(28px,5vw,52px); background:#F8F5EF; box-shadow:0 28px 90px rgba(0,0,0,.38); }
       .d2r-changemaker-dialog button { position:absolute; top:15px; right:15px; border:1px solid #006A4E; background:transparent; color:#006A4E; padding:8px 11px; font:600 11px Barlow,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
-      .d2r-changemaker-dialog h2 { margin:0 42px 6px 0; color:#006A4E; font:600 clamp(34px,5vw,48px)/1 Cormorant Garamond,serif; }
-      .d2r-changemaker-dialog h2 + p { margin:0 0 26px; color:#9A715C; font:600 12px Barlow,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-      .d2r-changemaker-dialog .bio-copy { color:#45413B; font:15px/1.7 Barlow,sans-serif; white-space:pre-line; }
-      #changemakers .d2r-cmcard { display:none !important; }
-      @media(max-width:700px) { .d2r-sector-dialog > div { grid-template-columns:1fr; } }
+       .d2r-changemaker-dialog h2 { margin:0 42px 6px 0; color:#006A4E; font:600 clamp(34px,5vw,48px)/1 Cormorant Garamond,serif; }
+       .d2r-changemaker-dialog h2 + p { margin:0 0 26px; color:#9A715C; font:600 12px Barlow,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+       .d2r-changemaker-dialog .bio-copy { color:#45413B; font:15px/1.7 Barlow,sans-serif; white-space:pre-line; }
+       .d2r-reel image-slot { filter:saturate(1.06) contrast(1.08) !important; }
+       #changemakers .d2r-cmcard { display:none !important; }
+       @media(max-width:820px) { .d2r-changemaker-feature { grid-template-columns:1fr; gap:28px; width:min(100% - 32px,620px); } .d2r-changemaker-feature-portrait,.d2r-changemaker-feature-portrait img { min-height:360px; } }
+       @media(max-width:700px) { .d2r-project-list { grid-template-columns:1fr; } .d2r-project-header { flex-direction:column; } .d2r-project-meta { justify-content:flex-start; } .d2r-project-details { grid-template-columns:1fr; } .d2r-project-details > div.is-notes { grid-column:auto; } }
       @media(max-width:700px) { .d2r-changemakers-roster { padding:0 40px; } .d2r-changemakers-roster button { flex-basis:138px; } .d2r-changemakers-roster button img { width:132px; height:132px; } .d2r-changemaker-arrow { width:34px; height:34px; top:44px; } }
       @media (max-width: 700px) { #top { min-height: 650px !important; } #hero-bg { transform:scale(1.12); } }
     `;
     document.head.appendChild(style);
   }
 
+  function removeLegacyChangemakerPlaceholder() {
+    const document = frameRef.current?.contentDocument;
+    if (!document) return;
+
+    // The bundled source includes a Brenda Smith demo card. It must disappear
+    // before managed content is fetched, so visitors never see the placeholder.
+    const legacyFeature = document.getElementById("cm-portrait")?.parentElement;
+    if (legacyFeature?.textContent?.includes("Brenda Smith")) legacyFeature.remove();
+  }
+
+  function renderImpactStats(document: Document, stats: SiteContent["impactStats"]) {
+    const impactItems = Array.from(document.querySelectorAll<HTMLElement>("#impact > div > div"));
+    stats.forEach((stat, index) => {
+      const item = impactItems[index];
+      if (!item) return;
+      const [value, label] = Array.from(item.querySelectorAll<HTMLElement>(":scope > div"));
+      if (value) value.textContent = stat.value;
+      if (label) label.textContent = stat.label;
+    });
+  }
+
+  function connectSocialMedia() {
+    const document = frameRef.current?.contentDocument;
+    if (!document) return;
+
+    const updateLink = (selector: string, href: string, label: string) => {
+      const link = document.querySelector<HTMLAnchorElement>(selector);
+      if (!link) return;
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.setAttribute("aria-label", label);
+    };
+
+    updateLink('a[aria-label="Follow on Facebook"]', facebookUrl, "Follow Dignity to Rise on Facebook");
+    updateLink('a[aria-label="Follow on Instagram"]', instagramUrl, "Follow Dignity to Rise on Instagram");
+
+    const socialTiles = [
+      {
+        href: "https://www.facebook.com/thedignitytorisemovement/posts/pfbid02kpPCgqPgvoGwPbyJsy2VDSVDb7tLTEUahrie8p5hg8957H7Pn826hwZ3KPGaF9btl",
+        image: "/social/facebook-volunteer-drive.jpg",
+        alt: "Dignity to Rise volunteer campaign from Facebook",
+        label: "View the Dignity to Rise volunteer campaign on Facebook"
+      },
+      {
+        href: "https://www.facebook.com/photo/?fbid=1721973719365588&set=a.614635080099463",
+        image: "/social/facebook-filmmaking-workshop.jpg",
+        alt: "Dignity to Rise filmmaking workshop post from Facebook",
+        label: "View the Dignity to Rise filmmaking workshop post on Facebook"
+      },
+      {
+        href: "https://www.facebook.com/photo/?fbid=1721973699365590&set=a.614635080099463",
+        image: "/social/facebook-community-team.jpg",
+        alt: "Dignity to Rise community team photo from Facebook",
+        label: "View the Dignity to Rise community team photo on Facebook"
+      }
+    ];
+
+    Array.from(document.querySelectorAll<HTMLAnchorElement>(".d2r-reel")).forEach((tile, index) => {
+      const details = socialTiles[index];
+      if (!details) return;
+      tile.href = details.href;
+      tile.target = "_blank";
+      tile.rel = "noopener noreferrer";
+      tile.setAttribute("aria-label", details.label);
+      const image = tile.querySelector("image-slot");
+      if (image) {
+        image.setAttribute("src", details.image);
+        image.setAttribute("alt", details.alt);
+      }
+    });
+  }
+
   async function applyManagedContent() {
     const document = frameRef.current?.contentDocument;
-    if (!document || document.documentElement.dataset.managedContentConnected) return;
-    document.documentElement.dataset.managedContentConnected = "true";
+    if (!document || document.documentElement.dataset.managedContentConnected || document.documentElement.dataset.managedContentLoading) return;
+    document.documentElement.dataset.managedContentLoading = "true";
+    const impactHeading = document.querySelector<HTMLElement>("#impact > p");
+    if (impactHeading) impactHeading.textContent = "The movement in numbers";
+    renderImpactStats(document, homepageImpactFallback);
     // The sector cards use “Live”; use the same status language on the opportunity cards.
     document.querySelectorAll("#d2r-opp-carousel .d2r-card").forEach((card) => {
       const activeStatus = Array.from(card.querySelectorAll("div")).find((element) => element.textContent?.trim() === "Active");
@@ -207,7 +326,7 @@ export default function HomepageFrame() {
       [cards[0], cards[3], cards[1], cards[2], cards[4]].filter((card): card is HTMLElement => Boolean(card)).forEach((card) => opportunityCarousel.append(card));
     }
     try {
-      const content = await fetch("/api/site-content", { cache: "no-store" }).then((response) => response.json());
+      const content = await fetch("/api/site-content", { cache: "no-store" }).then((response) => response.json()) as SiteContent;
       const setText = (selector: string, value: string) => { const element = document.querySelector(selector); if (element && value) element.textContent = value; };
       const background = document.getElementById("hero-bg");
       if (background && content.heroImage) background.setAttribute("src", content.heroImage);
@@ -225,10 +344,6 @@ export default function HomepageFrame() {
       });
       const elmarieName = document.getElementById("team-ellie")?.closest("a")?.querySelector(":scope > div > div");
       if (elmarieName) elmarieName.textContent = "Elmarie Meyer";
-      ["/social/community-market.jpg", "/social/digital-hub.jpg", "/social/hermanus-landscape.jpg"].forEach((source, index) => {
-        const reel = document.getElementById(`social-${index + 1}`);
-        if (reel) reel.setAttribute("src", source);
-      });
       const transparencyHeading = Array.from(document.querySelectorAll("h2")).find((heading) =>
         heading.textContent?.trim() === "Transparency Builds Trust"
       );
@@ -238,11 +353,59 @@ export default function HomepageFrame() {
         transparencyImage.setAttribute("alt", "Community members joining hands together");
       }
       const changemakersHeading = Array.from(document.querySelectorAll("h1, h2, h3")).find((heading) => heading.textContent?.toLowerCase().includes("changemaker"));
-      const changemakersSection = changemakersHeading?.closest("section");
+      const changemakersSection = document.getElementById("changemakers") ?? changemakersHeading?.closest("section");
+      const changemakerStories = Array.isArray(content.changemakers) ? content.changemakers : [];
+      const featuredChangemaker = changemakerStories.find((story) => story.id === content.featuredChangemakerId) ?? changemakerStories[0];
+      if (changemakersSection && featuredChangemaker && !changemakersSection.dataset.featuredStoryAdded) {
+        changemakersSection.dataset.featuredStoryAdded = "true";
+        // The source heading and carousel shell remain beneath the managed feature.
+        const feature = document.createElement("article");
+        feature.className = "d2r-changemaker-feature";
+
+        const portrait = document.createElement("figure");
+        portrait.className = "d2r-changemaker-feature-portrait";
+        const portraitImage = document.createElement("img");
+        portraitImage.src = featuredChangemaker.image;
+        portraitImage.alt = featuredChangemaker.imageAlt;
+        portraitImage.loading = "eager";
+        portrait.appendChild(portraitImage);
+
+        const copy = document.createElement("div");
+        copy.className = "d2r-changemaker-feature-copy";
+        const kicker = document.createElement("p");
+        kicker.textContent = "Changemaker in focus";
+        const name = document.createElement("h2");
+        name.textContent = featuredChangemaker.name;
+        const role = document.createElement("p");
+        role.className = "d2r-changemaker-feature-role";
+        role.textContent = [featuredChangemaker.role, featuredChangemaker.organisation].filter(Boolean).join(" · ");
+        const quote = document.createElement("p");
+        quote.className = "d2r-changemaker-feature-quote";
+        quote.textContent = `“${featuredChangemaker.quote}”`;
+        const summary = document.createElement("p");
+        summary.className = "d2r-changemaker-feature-summary";
+        summary.textContent = featuredChangemaker.summary;
+        const actions = document.createElement("div");
+        actions.className = "d2r-changemaker-feature-actions";
+        const readStory = document.createElement("a");
+        readStory.href = `/changemakers/${encodeURIComponent(featuredChangemaker.slug)}`;
+        readStory.target = "_top";
+        readStory.textContent = "Read the story";
+        const allStories = document.createElement("a");
+        allStories.href = "/changemakers";
+        allStories.target = "_top";
+        allStories.textContent = "All Changemakers";
+        actions.append(readStory, allStories);
+        copy.append(kicker, name, role, quote, summary, actions);
+        feature.append(portrait, copy);
+        changemakersSection.prepend(feature);
+      }
       if (changemakersSection && !changemakersSection.dataset.rosterAdded) {
         changemakersSection.dataset.rosterAdded = "true";
         changemakersSection.querySelectorAll(".d2r-cmcard").forEach((card) => { (card as HTMLElement).style.display = "none"; });
-        Array.from(changemakersSection.children).filter((child) => !child.contains(changemakersHeading ?? null)).forEach((child) => { (child as HTMLElement).style.display = "none"; });
+        Array.from(changemakersSection.children)
+          .filter((child) => !child.contains(changemakersHeading ?? null) && !(child as HTMLElement).classList.contains("d2r-changemaker-feature"))
+          .forEach((child) => { (child as HTMLElement).style.display = "none"; });
         const roster = document.createElement("div");
         roster.className = "d2r-changemakers-roster";
         const track = document.createElement("div");
@@ -251,7 +414,7 @@ export default function HomepageFrame() {
         const changemakers = [
           { name: "Sybil Doms Pretorius", role: "Project Director", company: "Dignity to Rise", photo: "/team/sybil-doms-pretorius.jpg" },
           { name: "Elmarie Meyer", role: "Programme Director", company: "Dignity to Rise", photo: "/team/elmarie-meyer.png" },
-          { name: "Noxolo Liwani", role: "Local Economic Development Officer", company: "Overstrand Municipality", photo: "/team/noxolo-liwani.jpeg" },
+          { name: "Noxolo Liwani", role: "Local Economic Development Officer", company: "Overstrand Municipality", photo: "/team/noxolo-liwani-feature.png" },
           { name: "Xolile Joseph Kosi", role: "Economic Development Practitioner", company: "Overstrand Municipality", photo: "/team/xolile-joseph-kosi.jpeg" },
           { name: "Heinrich Ungerer", role: "Founder & Director", company: "Food Security Program", photo: "/team/heinrich-ungerer.png" }
         ];
@@ -317,14 +480,24 @@ export default function HomepageFrame() {
       setText("#connect h2", content.contactHeading);
       setText("#connect h2 + p", content.contactCopy);
       setText("#impact > p", content.impactHeading);
-      const impactItems = Array.from(document.querySelectorAll("#impact > div > div"));
-      content.impactStats?.forEach((stat: { value: string; label: string }, index: number) => {
-        const item = impactItems[index];
-        if (!item) return;
-        const elements = item.querySelectorAll("div");
-        if (elements[0]) elements[0].textContent = stat.value;
-        if (elements[1]) elements[1].textContent = stat.label;
-      });
+      // Keep the value saved in Admin as a reliable public fallback. When the
+      // registration database is available, the live count below replaces it.
+      const impactStats = content.impactStats.map((stat) => ({ ...stat }));
+      renderImpactStats(document, impactStats);
+      void fetch("/api/impact-stats", { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) throw new Error("Volunteer registrations are unavailable.");
+          return response.json() as Promise<{ volunteers?: unknown }>;
+        })
+        .then((body) => {
+          const count = body.volunteers;
+          if (typeof count !== "number" || !Number.isSafeInteger(count) || count < 0) return;
+          const volunteerStat = impactStats.find((stat) => stat.key === "volunteers-registered");
+          if (!volunteerStat) return;
+          volunteerStat.value = String(count);
+          renderImpactStats(document, impactStats);
+        })
+        .catch(() => undefined);
       const sectorTiles = Array.from(document.querySelectorAll("#sectors .d2r-sectors-grid > a"));
       const sectorImageOverrides = [
         { source: "/sectors/agriculture-food-tile.jpg", position: "center" },
@@ -334,9 +507,17 @@ export default function HomepageFrame() {
         { source: "/sectors/local-services-tile.jpg", position: "40% center" },
         { source: "/sectors/tourism-tile.jpg", position: "center" }
       ];
-      content.sectors?.forEach((sector: { title: string; live: string; done: string; future: string; image: string; liveProjects: string[]; doneProjects: string[]; futureProjects: string[] }, index: number) => {
+      const projectStatusOrder: ProjectStatus[] = ["Live", "Planning", "Complete", "Future"];
+      const legacyProjects = (sector: SectorCard): SectorProject[] => [
+        ...(sector.liveProjects ?? []).map((name) => ({ name, status: "Live" as const })),
+        ...(sector.doneProjects ?? []).map((name) => ({ name, status: "Complete" as const })),
+        ...(sector.futureProjects ?? []).map((name) => ({ name, status: "Future" as const }))
+      ];
+      let sectorModalLauncher: HTMLAnchorElement | null = null;
+      content.sectors?.forEach((sector, index) => {
         const tile = sectorTiles[index] as HTMLAnchorElement | undefined;
         if (!tile) return;
+        const sectorProjects = sector.projects?.length ? sector.projects : legacyProjects(sector);
         const image = tile.querySelector("image-slot");
         const imageOverride = sectorImageOverrides[index];
         if (image) {
@@ -350,54 +531,129 @@ export default function HomepageFrame() {
         const title = tile.querySelector("h3");
         if (title) title.textContent = sector.title;
         const stats = title?.nextElementSibling;
-        const values = [String(sector.liveProjects?.length ?? sector.live), String(sector.doneProjects?.length ?? sector.done), String(sector.futureProjects?.length ?? sector.future)];
+        const values = [
+          String(sectorProjects.filter((project) => project.status === "Live").length),
+          String(sectorProjects.filter((project) => project.status === "Complete").length),
+          String(sectorProjects.filter((project) => project.status === "Planning" || project.status === "Future").length)
+        ];
         stats?.querySelectorAll("span").forEach((stat, statIndex) => {
-          const labels = ["Live", "Done", "Future"];
-          stat.innerHTML = `<strong style="color:#fff;font-weight:600;">${values[statIndex] ?? "0"}</strong> ${labels[statIndex] ?? ""}`;
+          const labels = ["Live", "Complete", "Future"];
+          const value = document.createElement("strong");
+          value.style.cssText = "color:#fff;font-weight:600;";
+          value.textContent = values[statIndex] ?? "0";
+          stat.replaceChildren(value, document.createTextNode(` ${labels[statIndex] ?? ""}`));
         });
         tile.setAttribute("href", "#sector-projects");
         tile.onclick = (event) => {
           event.preventDefault();
-          let modal = document.getElementById("d2r-sector-projects");
+          sectorModalLauncher = tile;
+          let modal = document.getElementById("d2r-sector-projects") as HTMLDivElement | null;
           if (!modal) {
-            modal = document.createElement("div");
-            modal.id = "d2r-sector-projects";
-            modal.innerHTML = '<div class="d2r-sector-dialog" role="dialog" aria-modal="true"><button type="button" aria-label="Close project list">Close</button><p></p><h2></h2><div></div></div>';
-            document.body.appendChild(modal);
-            modal.addEventListener("click", (closeEvent) => { if (closeEvent.target === modal || (closeEvent.target as Element).closest("button")) modal?.classList.remove("is-open"); });
+            const createdModal = document.createElement("div");
+            createdModal.id = "d2r-sector-projects";
+            createdModal.innerHTML = '<div class="d2r-sector-dialog" role="dialog" aria-modal="true" aria-labelledby="d2r-sector-heading"><button class="d2r-sector-close" type="button" aria-label="Close project details">Close</button><p></p><h2 id="d2r-sector-heading"></h2><div class="d2r-sector-project-content"></div></div>';
+            const closeModal = () => {
+              createdModal.classList.remove("is-open");
+              sectorModalLauncher?.focus();
+            };
+            createdModal.addEventListener("click", (closeEvent) => {
+              const target = closeEvent.target as Element | null;
+              if (closeEvent.target === createdModal || target?.closest(".d2r-sector-close")) closeModal();
+            });
+            document.addEventListener("keydown", (keyEvent) => {
+              if (keyEvent.key === "Escape" && createdModal.classList.contains("is-open")) closeModal();
+            });
+            document.body.appendChild(createdModal);
+            modal = createdModal;
           }
+          if (!modal) return;
           const dialog = modal.querySelector(".d2r-sector-dialog");
-          const eyebrow = dialog?.querySelector("p");
-          const heading = dialog?.querySelector("h2");
-          const lists = dialog?.querySelector("div");
+          const eyebrow = dialog?.querySelector<HTMLParagraphElement>(":scope > p");
+          const heading = dialog?.querySelector<HTMLHeadingElement>(":scope > h2");
+          const lists = dialog?.querySelector<HTMLDivElement>(":scope > .d2r-sector-project-content");
           if (eyebrow) eyebrow.textContent = "Sector projects";
           if (heading) heading.textContent = sector.title;
           if (lists) {
             lists.replaceChildren();
-            const projectGroups: [string, string[]][] = [["Live", sector.liveProjects], ["Completed", sector.doneProjects], ["Future", sector.futureProjects]];
-            projectGroups.forEach(([label, projects]) => {
+            let renderedGroups = 0;
+            projectStatusOrder.forEach((status) => {
+              const projects = sectorProjects.filter((project) => project.status === status);
+              if (!projects.length) return;
               const group = document.createElement("section");
-              const groupHeading = document.createElement("h3"); groupHeading.textContent = `${label} (${projects.length})`;
-              const list = document.createElement("ul");
-              projects.forEach((project) => { const item = document.createElement("li"); item.textContent = project; list.appendChild(item); });
-              if (!projects.length) { const item = document.createElement("li"); item.textContent = "No projects listed yet."; list.appendChild(item); }
+              group.className = "d2r-project-group";
+              const groupHeading = document.createElement("h3"); groupHeading.textContent = `${status} (${projects.length})`;
+              const list = document.createElement("div");
+              list.className = "d2r-project-list";
+              projects.forEach((project) => {
+                const card = document.createElement("article");
+                card.className = "d2r-project-card";
+                const header = document.createElement("div");
+                header.className = "d2r-project-header";
+                const name = document.createElement("h4");
+                name.textContent = project.name;
+                const meta = document.createElement("div");
+                meta.className = "d2r-project-meta";
+                const statusBadge = document.createElement("span");
+                statusBadge.className = `d2r-project-status d2r-project-status--${project.status.toLowerCase()}`;
+                statusBadge.textContent = project.status;
+                meta.appendChild(statusBadge);
+                if (project.reference) {
+                  const reference = document.createElement("span");
+                  reference.textContent = `Ref. ${project.reference}`;
+                  meta.appendChild(reference);
+                }
+                header.append(name, meta);
+                const details = document.createElement("dl");
+                details.className = "d2r-project-details";
+                const addDetail = (label: string, detail: string | undefined) => {
+                  const value = detail?.trim();
+                  if (!value) return;
+                  const item = document.createElement("div");
+                  if (label === "Notes") item.className = "is-notes";
+                  const term = document.createElement("dt");
+                  term.textContent = label;
+                  const description = document.createElement("dd");
+                  description.textContent = value;
+                  item.append(term, description);
+                  details.appendChild(item);
+                };
+                addDetail("Tranche 1 outcome", project.trancheOneOutcome);
+                addDetail("Future tranche", project.futureTrancheOutcome);
+                addDetail("Goes live in", project.goLiveTranche);
+                addDetail("Notes", project.notes);
+                card.appendChild(header);
+                if (details.children.length) card.appendChild(details);
+                list.appendChild(card);
+              });
               group.append(groupHeading, list); lists.appendChild(group);
+              renderedGroups += 1;
             });
+            if (!renderedGroups) {
+              const empty = document.createElement("p");
+              empty.textContent = "No projects are listed for this sector yet.";
+              lists.appendChild(empty);
+            }
           }
           modal.classList.add("is-open");
+          modal.querySelector<HTMLButtonElement>(".d2r-sector-close")?.focus();
         };
       });
-    } catch (error) { console.error("Could not apply managed site content", error); }
+      delete document.documentElement.dataset.managedContentLoading;
+      document.documentElement.dataset.managedContentConnected = "true";
+    } catch (error) {
+      delete document.documentElement.dataset.managedContentLoading;
+      console.error("Could not apply managed site content", error);
+    }
   }
 
   useEffect(() => {
-    const attachHomepageEnhancements = () => { connectParticipationLinks(); connectNewsletterSignup(); compactFooter(); polishHero(); applyManagedContent(); };
+    const attachHomepageEnhancements = () => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); };
     attachHomepageEnhancements();
     const timer = window.setInterval(attachHomepageEnhancements, 250);
     return () => window.clearInterval(timer);
   }, []);
 
   return <main className="bundled-homepage" style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh" }}>
-    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); polishHero(); applyManagedContent(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
+    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
   </main>;
 }
