@@ -41,20 +41,34 @@ export default function AdminDashboard() {
   const [media, setMedia] = useState<Media[]>([]);
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
-  function refresh() {
-    fetch("/api/dashboard").then((response) => response.json()).then(setData);
-    fetch("/api/media").then((response) => response.json()).then(setMedia);
+  async function refresh() {
+    const [dashboardResponse, mediaResponse] = await Promise.all([fetch("/api/dashboard"), fetch("/api/media")]);
+    setData(await dashboardResponse.json());
+    setMedia(await mediaResponse.json());
   }
 
   useEffect(() => {
     fetch("/api/site-content").then((response) => response.json()).then(setContent);
-    refresh();
+    void refresh();
   }, []);
 
   function update(key: HomepageField, value: string) {
     if (content) setContent({ ...content, [key]: value });
+  }
+
+  async function deleteRecord(record: Data["records"][number]) {
+    if (!window.confirm(`Delete ${record.name}'s ${record.type.toLowerCase()} record? This cannot be undone.`)) return;
+    setDeletingId(record.id);
+    setStatus(`Deleting ${record.name}'s record...`);
+    const response = await fetch(`/api/admin/records/${record.id}`, { method: "DELETE" });
+    const body = await response.json().catch(() => ({}));
+    setDeletingId(null);
+    if (!response.ok) return setStatus(body.error ?? "Could not delete this record.");
+    setStatus(`${record.name}'s record was deleted.`);
+    await refresh();
   }
 
   function updateSector(index: number, key: "title" | "image", value: string) {
@@ -157,7 +171,7 @@ export default function AdminDashboard() {
       <header id="overview"><div><p className="eyebrow">Dignity to Rise</p><h1>Operations dashboard</h1><p>Clear, up-to-date visibility of people joining the movement.</p></div><div className="admin-actions"><button onClick={refresh}>Refresh data</button></div></header>
       <section className="stats-grid">{cards.map(([label, count]) => <article key={label as string}><span>{label}</span><strong>{count as number}</strong><small>Submitted forms</small></article>)}</section>
       <section className="tracking-grid"><article className="tracking-card analytics-card"><p className="eyebrow">Participation analytics</p><h2>{total} people in the pipeline</h2><p className="empty-copy">{recentCount} new submission{recentCount === 1 ? "" : "s"} in the last 7 days.</p><div className="distribution">{cards.map(([label, count]) => <div key={label as string}><span>{label}</span><i><b style={{ width: `${((count as number) / maxCount) * 100}%` }} /></i><strong>{count as number}</strong></div>)}</div></article><article className="tracking-card"><div className="section-title"><div><p className="eyebrow">Volunteer planning</p><h2>Availability</h2></div></div>{data.availability.length ? <div className="availability-list">{data.availability.map((item) => <div key={item.slot}><span>{item.slot}</span><b>{item.count}</b></div>)}</div> : <p className="empty-copy">Availability appears after volunteers submit the form.</p>}</article></section>
-      <section className="records-card" id="people"><div className="section-title"><div><p className="eyebrow">People tracker</p><h2>Recent activity & separate exports</h2></div><button className="refresh-button" onClick={refresh}>Refresh</button></div><div className="admin-actions" aria-label="Separate collection exports">{exportCollections.map((collection) => <div key={collection}><span>{exportLabel[collection]}</span><a href={`/api/export?collection=${collection}&format=xlsx`}>Excel</a><a href={`/api/export?collection=${collection}&format=pdf`}>PDF</a></div>)}</div>{data.records.length ? <div className="record-table">{data.records.map((record) => <article key={record.id}><div><b>{record.name}</b><span>{record.email}</span>{record.availability && <small>{record.availability}</small>}</div><div><em>{record.type}</em><time>{record.submittedAt ? new Date(record.submittedAt).toLocaleDateString() : "New"}</time></div></article>)}</div> : <p className="empty-copy">Submissions will appear here automatically.</p>}</section>
+      <section className="records-card" id="people"><div className="section-title"><div><p className="eyebrow">People tracker</p><h2>Recent activity & separate exports</h2></div><button className="refresh-button" onClick={refresh}>Refresh</button></div><div className="admin-actions" aria-label="Separate collection exports">{exportCollections.map((collection) => <div key={collection}><span>{exportLabel[collection]}</span><a href={`/api/export?collection=${collection}&format=xlsx`}>Excel</a><a href={`/api/export?collection=${collection}&format=pdf`}>PDF</a></div>)}</div>{data.records.length ? <div className="record-table">{data.records.map((record) => <article key={record.id}><div><b>{record.name}</b><span>{record.email}</span>{record.availability && <small>{record.availability}</small>}</div><div className="record-actions"><em>{record.type}</em><time>{record.submittedAt ? new Date(record.submittedAt).toLocaleDateString() : "New"}</time><button type="button" className="delete-record" onClick={() => void deleteRecord(record)} disabled={deletingId === record.id}>{deletingId === record.id ? "Deleting..." : "Delete"}</button></div></article>)}</div> : <p className="empty-copy">Submissions will appear here automatically.</p>}</section>
       <section className="tracking-card media-card" id="media"><p className="eyebrow">Image library</p><h2>Media</h2><label className="upload-control">{uploading ? "Uploading..." : "Import image"}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={upload} disabled={uploading} /></label><p className="empty-copy">JPG, PNG, or WebP - maximum 8 MB. Use a sharp, well-lit source image for a Changemaker feature.</p><div className="media-list">{media.map((image) => <button type="button" key={image.url} onClick={() => { update("heroImage", image.url); setStatus(`${image.name} selected as hero image. Click Save and publish.`); }}><img src={image.url} alt="" /><span>{image.name}</span><small>{Math.ceil(image.size / 1024)} KB</small></button>)}</div></section>
       <form className="content-form" id="content" onSubmit={save}>
         <div className="form-section-heading"><p className="eyebrow">Essential website editor</p><h2>Homepage content</h2><p>Only key visitor-facing content is editable here.</p></div>

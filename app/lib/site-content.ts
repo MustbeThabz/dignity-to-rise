@@ -130,7 +130,7 @@ What has kept me in this space isn't the paperwork. It's the people behind it: t
 
 The opening of the Multi-Purpose Centre at the New Harbour.
 
-We didn't just hand out aid. We created a space where local youth could build their own future, where vendors and crafters were given dignity and a proper place to trade, and where free WiFi and computers gave people access to opportunities they otherwise couldn't reach — whether that meant applying to a tertiary institution, registering a business or applying for funding.
+We didn't just hand out aid. We created a space where local youth could build their own future, where vendors and crafters were given dignity and a proper place to trade, and where free WiFi and computers gave people access to opportunities they otherwise couldn't reach, whether that meant applying to a tertiary institution, registering a business or applying for funding.
 
 Beyond that, I've had the privilege of walking alongside many emerging entrepreneurs and watching them grow: sourcing industrial machines for fashion designers, cooking equipment for caterers, training and skills development for traders, start-up equipment and training for emerging plant growers, and funding and Asset Assist applications for trading stallholders. One outcome I'm especially proud of is a mushroom grower who, through collaboration and partnership, built a genuinely successful enterprise.
 
@@ -140,7 +140,7 @@ That work was recognised when I was awarded by the province as the top achiever 
 
 ## If you could make one big change in the Overstrand, what would it be?
 
-I'd want to see informal economic activity — small-scale agriculture, informal trade and emerging enterprises operating outside formal zoning or business structures — properly bridged into the formal economy, rather than left in a grey area where it is neither supported nor regulated.
+I'd want to see informal economic activity, small-scale agriculture, informal trade and emerging enterprises operating outside formal zoning or business structures, properly bridged into the formal economy, rather than left in a grey area where it is neither supported nor regulated.
 
 Right now, many people doing this kind of work carry real economic value for their households and communities. But without a pathway to formalise, they can't access funding, they can't be protected by proper land-use planning, and the municipality can't plan around them either.
 
@@ -168,7 +168,7 @@ export const defaultSiteContent: SiteContent = {
   ctaTitle: "The future of the Overstrand will not be built by one organisation.",
   ctaCopy: "It will be built by thousands of people, working together.",
   contactHeading: "People, not forms.",
-  contactCopy: "Reach out to us directly — we would love to hear from you.",
+  contactCopy: "Reach out to us directly, we would love to hear from you.",
   impactHeading: "The movement in numbers",
   impactStats: defaultImpactStats,
   changemakers: [noxoloLiwaniStory],
@@ -189,7 +189,7 @@ export const defaultSiteContent: SiteContent = {
     ]),
     createSector("Digital & Remote", "/sectors/digital-remote-tile.jpg", [
       { name: "Dignity to Rise Hub", reference: "3.1", status: "Live", trancheOneOutcome: "Create an online hub to co-ordinate projects, volunteers and funding.", notes: "The webpage is up and running and will be completed in Tranche 1." },
-      { name: "Little Black Book - Community Organisations", reference: "4.1, 5.2 & 7.3", status: "Live", trancheOneOutcome: "NGO needs captured and visible.", futureTrancheOutcome: "Dedicated digital Black Book created.", notes: "All known NGOs contacted." },
+      { name: "Little Black Book, Community Organisations", reference: "4.1, 5.2 & 7.3", status: "Live", trancheOneOutcome: "NGO needs captured and visible.", futureTrancheOutcome: "Dedicated digital Black Book created.", notes: "All known NGOs contacted." },
       { name: "Project Register & KPIs", reference: "3.13 & 3.14", status: "Live", trancheOneOutcome: "Project list and KPIs live on the hub.", notes: "Project list shared with the community." }
     ]),
     createSector("Local Services", "/sectors/local-services-tile.jpg", [
@@ -199,7 +199,7 @@ export const defaultSiteContent: SiteContent = {
       { name: "Hermanus Passport", reference: "6.1", status: "Live", trancheOneOutcome: "Permission for physical sites given by the municipality.", futureTrancheOutcome: "Physical and digital passport available." },
       { name: "Overberg Fashion Academy & Fashion Week", reference: "6.9 & 6.10", status: "Planning" },
       { name: "Winter Tourism Strategy", reference: "6.13", status: "Planning" },
-      { name: "Food Truck Idea - Up the Vibe", status: "Future", trancheOneOutcome: "Identify a site, starting with the Friday market behind the school." },
+      { name: "Food Truck Idea, Up the Vibe", status: "Future", trancheOneOutcome: "Identify a site, starting with the Friday market behind the school." },
       { name: "Dutchies Park Community Trust", status: "Future", trancheOneOutcome: "Develop the Community Trust concept for security, maintenance, a food kiosk and a service provider.", notes: "Next step: prepare a more complete proposal." }
     ])
   ]
@@ -214,12 +214,13 @@ export async function getSiteContent(): Promise<SiteContent> {
     const storedImpactStatsByKey = new Map(storedImpactStats
       .filter((stat) => typeof stat?.key === "string" && impactStatKeys.includes(stat.key as ImpactStatKey))
       .map((stat) => [stat.key as ImpactStatKey, stat]));
+    const hasAllZeroPlaceholderStats = storedImpactStats.length === defaultImpactStats.length
+      && storedImpactStats.every((stat) => String(stat?.value ?? "").trim() === "0");
     const impactStats: SiteContent["impactStats"] = defaultImpactStats.map((stat, index) => {
       const keyedStat = stat.key ? storedImpactStatsByKey.get(stat.key) : undefined;
-      // Older Admin saves pre-date stat keys. Keep their values by position,
-      // but use the current canonical label so 21 remains Volunteers registered.
-      const legacyStat = storedImpactStatsByKey.size === 0 ? storedImpactStats[index] : undefined;
-      const storedStat = keyedStat ?? legacyStat;
+      // The former Admin saved a six-zero placeholder set. It is not a valid
+      // public update, even where a deployment has since added stat keys.
+      const storedStat = hasAllZeroPlaceholderStats ? undefined : keyedStat;
       const hasLegacyVolunteerLabel = stat.key === "volunteers-registered" && keyedStat?.label?.trim().toLowerCase() === "people upskilled";
       return {
         ...stat,
@@ -227,6 +228,14 @@ export async function getSiteContent(): Promise<SiteContent> {
         value: typeof storedStat?.value === "string" ? storedStat.value : stat.value
       };
     });
+    if (hasAllZeroPlaceholderStats && stored?._id) {
+      // Persist the correction once, but only while the exact stale array is
+      // still present so a concurrent Admin update can never be overwritten.
+      await collection.updateOne(
+        { _id: stored._id, "content.impactStats": storedContent.impactStats },
+        { $set: { "content.impactStats": impactStats, updatedAt: new Date() } }
+      );
+    }
     const changemakers = Array.isArray(storedContent.changemakers) && storedContent.changemakers.length
       ? storedContent.changemakers as ChangemakerStory[]
       : defaultSiteContent.changemakers;

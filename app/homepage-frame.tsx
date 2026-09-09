@@ -197,6 +197,95 @@ export default function HomepageFrame() {
     document.head.appendChild(style);
   }
 
+  function makeHomepageMobileFriendly() {
+    const document = frameRef.current?.contentDocument;
+    if (!document) return;
+
+    if (!document.getElementById("d2r-mobile-layout")) {
+      const style = document.createElement("style");
+      style.id = "d2r-mobile-layout";
+      style.textContent = `
+        html { scroll-behavior:smooth; }
+        img, svg { max-width:100%; }
+        .d2r-mobile-menu-button { display:none; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid currentColor; background:transparent; color:inherit; font:600 10px/1 Barlow,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+        @media (max-width: 760px) {
+          #top { height:auto !important; min-height:680px !important; }
+          #d2r-nav { padding:14px 20px !important; }
+          #d2r-nav .d2r-mobile-menu-button { display:inline-flex; }
+          #d2r-nav .d2r-navlinks { position:absolute; top:100%; left:0; right:0; display:none !important; flex-direction:column; align-items:stretch; gap:0 !important; padding:8px 20px 18px; background:#F8F5EF; color:#1A1A1A; box-shadow:0 14px 28px rgba(0,45,33,.2); }
+          #d2r-nav.menu-open .d2r-navlinks { display:flex !important; }
+          #d2r-nav .d2r-navlinks a { display:block; padding:14px 0; border-bottom:1px solid #E0D8C9; font-size:13px !important; }
+          #d2r-nav .d2r-navlinks a:last-child { margin-top:9px; border:0; background:#B89454; color:#fff; padding:14px 16px; text-align:center; }
+          #top > div:not(#d2r-nav) { padding-left:20px !important; padding-right:20px !important; }
+          #top h1 { font-size:clamp(42px,12vw,60px) !important; line-height:1.02 !important; }
+          #top h1 + p, #top .hero-intro { margin-top:24px !important; font-size:18px !important; line-height:1.45 !important; }
+          #top a { max-width:100%; }
+          .d2r-changemaker-dialog, #d2r-sector-projects { padding:12px !important; }
+          .d2r-changemaker-dialog > div, .d2r-sector-dialog { max-height:calc(100dvh - 24px) !important; padding:48px 22px 24px !important; }
+          .d2r-changemaker-feature { width:calc(100% - 24px) !important; padding:20px !important; }
+          .d2r-changemaker-feature-portrait, .d2r-changemaker-feature-portrait img { min-height:280px !important; }
+          .d2r-changemaker-feature h2 { font-size:42px !important; }
+          .d2r-changemaker-feature-quote { margin-top:22px !important; font-size:27px !important; }
+          .d2r-changemaker-feature-summary { margin-top:20px !important; font-size:15px !important; }
+          .d2r-changemakers-roster { padding:0 32px !important; }
+          .d2r-changemakers-roster button { flex-basis:116px !important; font-size:17px !important; }
+          .d2r-changemakers-roster button img { width:108px !important; height:108px !important; }
+          .d2r-changemaker-arrow { top:35px !important; width:30px !important; height:30px !important; }
+          #sectors .d2r-sectors-grid { grid-template-columns:1fr !important; }
+          #sectors .d2r-sectors-grid > a { min-height:230px !important; }
+          #impact > div { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:20px 12px !important; }
+          #connect [style*="grid-template-columns"] { gap:44px !important; }
+        }
+        @media (max-width: 390px) {
+          #top h1 { font-size:40px !important; }
+          #impact > div { grid-template-columns:1fr !important; }
+          #connect a[aria-label^="Follow"] { padding:10px 12px !important; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const nav = document.getElementById("d2r-nav");
+    const navLinks = nav?.querySelector(".d2r-navlinks");
+    if (!nav || !navLinks || nav.querySelector(".d2r-mobile-menu-button")) return;
+
+    const menu = document.createElement("button");
+    menu.type = "button";
+    menu.className = "d2r-mobile-menu-button";
+    menu.setAttribute("aria-expanded", "false");
+    menu.setAttribute("aria-controls", "d2r-mobile-navigation");
+    menu.textContent = "Menu";
+    navLinks.id = "d2r-mobile-navigation";
+    menu.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("menu-open");
+      menu.setAttribute("aria-expanded", String(isOpen));
+      menu.textContent = isOpen ? "Close" : "Menu";
+    });
+    navLinks.addEventListener("click", () => {
+      nav.classList.remove("menu-open");
+      menu.setAttribute("aria-expanded", "false");
+      menu.textContent = "Menu";
+    });
+    nav.appendChild(menu);
+  }
+
+  function replaceDashPunctuation() {
+    const document = frameRef.current?.contentDocument;
+    if (!document?.body) return;
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || ["SCRIPT", "STYLE"].includes(parent.tagName)) continue;
+      nodes.push(node as Text);
+    }
+    nodes.forEach((text) => {
+      text.nodeValue = text.nodeValue?.replace(/\s[—–-]\s/g, ", ") ?? null;
+    });
+  }
+
   function removeLegacyChangemakerPlaceholder() {
     const document = frameRef.current?.contentDocument;
     if (!document) return;
@@ -316,7 +405,7 @@ export default function HomepageFrame() {
       });
       updateCard(cards[3], {
         category: "Digital & Remote Work",
-        title: "Little Black Book - Community Organisations",
+        title: "Little Black Book, Community Organisations",
         status: "Live",
         statusColor: "#006A4E",
         image: "/sectors/digital-remote.jpg",
@@ -647,13 +736,13 @@ export default function HomepageFrame() {
   }
 
   useEffect(() => {
-    const attachHomepageEnhancements = () => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); };
+    const attachHomepageEnhancements = () => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); makeHomepageMobileFriendly(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); replaceDashPunctuation(); };
     attachHomepageEnhancements();
     const timer = window.setInterval(attachHomepageEnhancements, 250);
     return () => window.clearInterval(timer);
   }, []);
 
   return <main className="bundled-homepage" style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh" }}>
-    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
+    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); makeHomepageMobileFriendly(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); replaceDashPunctuation(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
   </main>;
 }

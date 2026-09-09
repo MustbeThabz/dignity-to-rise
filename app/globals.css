@@ -141,15 +141,15 @@ textarea { display: block; margin-top: 18px; resize: vertical; }
 .changemaker-story-summary { max-width:650px; margin:28px 0 0; color:#5a5752; font:18px/1.7 Arial,sans-serif; }
 .changemaker-story-portrait { min-height:400px; margin:0; background:#e8e2d8; overflow:hidden; }
 .changemaker-story-portrait img { display:block; width:100%; height:100%; min-height:400px; object-fit:cover; object-position:center; filter:contrast(1.08) saturate(1.05); }
-.changemaker-story-body { width:min(100% - clamp(56px,12vw,160px),760px); margin:0 auto; padding:0 0 clamp(36px,6vw,80px); }
-.changemaker-story-body h2 { margin:clamp(38px,6vw,64px) 0 18px; color:var(--changemaker-green); font:500 clamp(30px,4vw,46px)/1.12 Georgia,"Times New Roman",serif; }
+.changemaker-story-body { width:min(100% - clamp(32px,8vw,100px),760px); margin:0 0 0 clamp(28px,5vw,64px); padding:0 0 clamp(36px,6vw,80px); }
+.changemaker-story-body h2 { margin:clamp(38px,6vw,64px) 0 16px; color:var(--changemaker-green); font:500 clamp(24px,3vw,36px)/1.15 Georgia,"Times New Roman",serif; }
 .changemaker-story-body h2:first-child { margin-top:0; }
 .changemaker-story-body p { margin:0 0 24px; color:#514e48; font:18px/1.75 Arial,sans-serif; }
 .changemaker-story-body p:last-child { margin-bottom:0; }
-.changemaker-project-link { width:min(100% - clamp(56px,12vw,160px),760px); margin:0 auto; padding:28px 0 clamp(36px,6vw,80px); border-top:1px solid #e0d8c9; }
+.changemaker-project-link { width:min(100% - clamp(32px,8vw,100px),760px); margin:0 0 0 clamp(28px,5vw,64px); padding:28px 0 clamp(36px,6vw,80px); border-top:1px solid #e0d8c9; }
 .changemaker-project-link .eyebrow { margin-bottom:9px; }
 @media(max-width:850px) { .changemaker-story-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.changemaker-story-header { grid-template-columns:1fr; }.changemaker-story-portrait { min-height:360px; order:-1; }.changemaker-story-portrait img { min-height:360px; } }
-@media(max-width:580px) { .changemakers-page { padding:32px 18px 66px; }.changemaker-navigation { display:grid; grid-template-columns:1fr; }.changemaker-navigation a { justify-content:center; }.changemakers-hero h1 { font-size:44px; }.changemaker-story-grid { grid-template-columns:1fr; }.changemaker-story-card-copy { padding:23px; }.changemaker-story-header { gap:28px; padding:24px; }.changemaker-story-header h1 { font-size:47px; }.changemaker-story-portrait,.changemaker-story-portrait img { min-height:300px; }.changemaker-story-body,.changemaker-project-link { width:calc(100% - 48px); }.changemaker-story-body p { font-size:17px; } }
+@media(max-width:580px) { .changemakers-page { padding:32px 18px 66px; }.changemaker-navigation { display:grid; grid-template-columns:1fr; }.changemaker-navigation a { justify-content:center; }.changemakers-hero h1 { font-size:44px; }.changemaker-story-grid { grid-template-columns:1fr; }.changemaker-story-card-copy { padding:23px; }.changemaker-story-header { gap:28px; padding:24px; }.changemaker-story-header h1 { font-size:47px; }.changemaker-story-portrait,.changemaker-story-portrait img { min-height:300px; }.changemaker-story-body,.changemaker-project-link { width:calc(100% - 32px); margin-left:16px; }.changemaker-story-body h2 { font-size:24px; }.changemaker-story-body p { font-size:17px; } }
 
 /* Monthly Changemakers editor. */
 .changemaker-editor { grid-column:1 / -1; padding:28px; border:1px solid #e0d8c9; background:#fff; }
@@ -170,3 +170,9 @@ textarea { display: block; margin-top: 18px; resize: vertical; }
 .changemaker-admin-grid .full-width { grid-column:1 / -1; }
 .changemaker-admin-grid textarea { min-height:94px; }.changemaker-admin-grid .full-width:last-child textarea { min-height:300px; }
 @media(max-width:700px) { .changemaker-editor { padding:20px; }.changemaker-admin-card { padding:17px; }.changemaker-admin-card-head { display:grid; }.changemaker-admin-card-head > div:last-child { justify-content:flex-start; }.changemaker-admin-grid { grid-template-columns:1fr; }.changemaker-admin-grid .full-width { grid-column:auto; } }
+
+.record-actions { display:grid; justify-items:end; gap:7px; }
+.delete-record { border:1px solid #9e4d3d; background:transparent; color:#9e4d3d; padding:7px 9px; font:700 9px Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+.delete-record:hover,.delete-record:focus-visible { background:#9e4d3d; color:#fff; }
+.delete-record:disabled { opacity:.6; cursor:wait; }
+@media(max-width:520px) { .record-actions { justify-items:start; } }
