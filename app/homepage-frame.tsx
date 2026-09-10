@@ -210,9 +210,9 @@ export default function HomepageFrame() {
         .d2r-mobile-menu-button { display:none; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid currentColor; background:transparent; color:inherit; font:600 10px/1 Barlow,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
         @media (max-width: 760px) {
           #top { height:auto !important; min-height:680px !important; }
-          #d2r-nav { padding:14px 20px !important; }
+          #d2r-nav { position:relative !important; z-index:1000 !important; padding:14px 20px !important; }
           #d2r-nav .d2r-mobile-menu-button { display:inline-flex; }
-          #d2r-nav .d2r-navlinks { position:absolute; top:100%; left:0; right:0; display:none !important; flex-direction:column; align-items:stretch; gap:0 !important; padding:8px 20px 18px; background:#F8F5EF; color:#1A1A1A; box-shadow:0 14px 28px rgba(0,45,33,.2); }
+          #d2r-nav .d2r-navlinks { position:absolute; z-index:1001; top:100%; left:0; right:0; display:none !important; flex-direction:column; align-items:stretch; gap:0 !important; padding:8px 20px 18px; background:#F8F5EF; color:#1A1A1A; box-shadow:0 14px 28px rgba(0,45,33,.2); }
           #d2r-nav.menu-open .d2r-navlinks { display:flex !important; }
           #d2r-nav .d2r-navlinks a { display:block; padding:14px 0; border-bottom:1px solid #E0D8C9; font-size:13px !important; }
           #d2r-nav .d2r-navlinks a:last-child { margin-top:9px; border:0; background:#B89454; color:#fff; padding:14px 16px; text-align:center; }
@@ -231,8 +231,8 @@ export default function HomepageFrame() {
           .d2r-changemakers-roster button { flex-basis:116px !important; font-size:17px !important; }
           .d2r-changemakers-roster button img { width:108px !important; height:108px !important; }
           .d2r-changemaker-arrow { top:35px !important; width:30px !important; height:30px !important; }
-          #sectors .d2r-sectors-grid { grid-template-columns:1fr !important; }
-          #sectors .d2r-sectors-grid > a { min-height:230px !important; }
+          #sectors .d2r-sectors-grid { display:grid !important; grid-template-columns:1fr !important; }
+          #sectors .d2r-sectors-grid > a { width:100% !important; min-height:230px !important; }
           #impact > div { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:20px 12px !important; }
           #connect [style*="grid-template-columns"] { gap:44px !important; }
         }
