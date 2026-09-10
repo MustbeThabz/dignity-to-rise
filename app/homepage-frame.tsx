@@ -205,12 +205,16 @@ export default function HomepageFrame() {
       const style = document.createElement("style");
       style.id = "d2r-mobile-layout";
       style.textContent = `
-        html { scroll-behavior:smooth; }
+        html { scroll-behavior:smooth; -webkit-overflow-scrolling:touch; }
+        body { -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; }
         img, svg { max-width:100%; }
         .d2r-mobile-menu-button { display:none; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid currentColor; background:transparent; color:inherit; font:600 10px/1 Barlow,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
         @media (max-width: 760px) {
           #top { height:auto !important; min-height:680px !important; }
-          #d2r-nav { position:relative !important; z-index:1000 !important; padding:14px 20px !important; }
+          /* Keep the menu control at the top of the viewport while the page
+             scrolls. Using relative positioning here caused the header to
+             leave the viewport and could trap touch scrolling behind it. */
+          #d2r-nav { position:fixed !important; top:0 !important; left:0 !important; right:0 !important; z-index:1000 !important; overflow:visible !important; padding:14px 20px !important; }
           #d2r-nav .d2r-mobile-menu-button { display:inline-flex; }
           #d2r-nav .d2r-navlinks { position:absolute; z-index:1001; top:100%; left:0; right:0; display:none !important; flex-direction:column; align-items:stretch; gap:0 !important; padding:8px 20px 18px; background:#F8F5EF; color:#1A1A1A; box-shadow:0 14px 28px rgba(0,45,33,.2); }
           #d2r-nav.menu-open .d2r-navlinks { display:flex !important; }
@@ -742,7 +746,7 @@ export default function HomepageFrame() {
     return () => window.clearInterval(timer);
   }, []);
 
-  return <main className="bundled-homepage" style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh" }}>
-    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); makeHomepageMobileFriendly(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); replaceDashPunctuation(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100vw", height: "100vh", border: 0 }} />
+  return <main className="bundled-homepage" style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "100dvh", overflow: "hidden" }}>
+    <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); makeHomepageMobileFriendly(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); replaceDashPunctuation(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100%", height: "100dvh", minHeight: "100dvh", border: 0, touchAction: "pan-y" }} />
   </main>;
 }
