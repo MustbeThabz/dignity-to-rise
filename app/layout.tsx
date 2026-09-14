@@ -3,8 +3,17 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Dignity to Rise | Volunteer Registration",
-  description: "Overstrand volunteer registration form"
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://dignitytorise.co.za"),
+  title: {
+    default: "Dignity to Rise | Overstrand",
+    template: "%s | Dignity to Rise"
+  },
+  description: "Dignity to Rise brings people, skills and resources together to build opportunity across the Overstrand.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  }
 };
 
 // Without a viewport declaration, mobile browsers render the site against a

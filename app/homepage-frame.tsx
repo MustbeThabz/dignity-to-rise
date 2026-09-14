@@ -205,9 +205,13 @@ export default function HomepageFrame() {
       const style = document.createElement("style");
       style.id = "d2r-mobile-layout";
       style.textContent = `
-        html { scroll-behavior:smooth; -webkit-overflow-scrolling:touch; }
-        body { -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; }
+        html { scroll-behavior:smooth; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+        body { min-height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
         img, svg { max-width:100%; }
+        /* Image-slot is a custom element from the bundled page. Explicitly
+           permit vertical panning so a swipe that starts over a photo scrolls
+           the page on touch devices instead of being held by the image. */
+        image-slot, image-slot *, .d2r-reel, .d2r-sectors-grid > a { touch-action:pan-y; -webkit-user-drag:none; }
         .d2r-mobile-menu-button { display:none; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid currentColor; background:transparent; color:inherit; font:600 10px/1 Barlow,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
         @media (max-width: 760px) {
           #top { height:auto !important; min-height:680px !important; }
@@ -746,7 +750,7 @@ export default function HomepageFrame() {
     return () => window.clearInterval(timer);
   }, []);
 
-  return <main className="bundled-homepage" style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "100dvh", overflow: "hidden" }}>
+  return <main className="bundled-homepage" style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "100dvh", overflow: "hidden", touchAction: "pan-y" }}>
     <iframe ref={frameRef} onLoad={() => { connectParticipationLinks(); connectNewsletterSignup(); connectSocialMedia(); compactFooter(); makeHomepageMobileFriendly(); polishHero(); removeLegacyChangemakerPlaceholder(); applyManagedContent(); replaceDashPunctuation(); }} title="Dignity to Rise Overstrand" src="/dignity-to-rise-homepage.html" className="bundled-homepage-frame" style={{ display: "block", width: "100%", height: "100dvh", minHeight: "100dvh", border: 0, touchAction: "pan-y" }} />
   </main>;
 }
