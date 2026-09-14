@@ -168,8 +168,14 @@ textarea { display: block; margin-top: 18px; resize: vertical; }
 .remove-story:hover,.remove-story:focus-visible { background:#9e4d3d; color:#fff; }.add-changemaker:hover,.add-changemaker:focus-visible { background:#006a4e; color:#fff; }
 .changemaker-admin-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
 .changemaker-admin-grid .full-width { grid-column:1 / -1; }
+.changemaker-image-field { display:grid; gap:8px; color:#006a4e; font:700 11px/1.2 Arial,sans-serif; letter-spacing:.11em; text-transform:uppercase; }
+.changemaker-image-upload { display:flex; align-items:center; gap:16px; padding:12px; border:1px solid #e0d8c9; background:#fffdf8; }
+.changemaker-image-upload img { width:96px; height:76px; object-fit:cover; background:#e8e2d8; }
+.changemaker-image-upload > div { display:grid; justify-items:start; gap:7px; }
+.changemaker-image-upload .upload-control { margin:0; }
+.changemaker-image-upload p { margin:0; color:#69645d; font:12px/1.4 Arial,sans-serif; letter-spacing:0; text-transform:none; }
 .changemaker-admin-grid textarea { min-height:94px; }.changemaker-admin-grid .full-width:last-child textarea { min-height:300px; }
-@media(max-width:700px) { .changemaker-editor { padding:20px; }.changemaker-admin-card { padding:17px; }.changemaker-admin-card-head { display:grid; }.changemaker-admin-card-head > div:last-child { justify-content:flex-start; }.changemaker-admin-grid { grid-template-columns:1fr; }.changemaker-admin-grid .full-width { grid-column:auto; } }
+@media(max-width:700px) { .changemaker-editor { padding:20px; }.changemaker-admin-card { padding:17px; }.changemaker-admin-card-head { display:grid; }.changemaker-admin-card-head > div:last-child { justify-content:flex-start; }.changemaker-admin-grid { grid-template-columns:1fr; }.changemaker-admin-grid .full-width { grid-column:auto; }.changemaker-image-upload { align-items:flex-start; } }
 
 .record-actions { display:grid; justify-items:end; gap:7px; }
 .delete-record { border:1px solid #9e4d3d; background:transparent; color:#9e4d3d; padding:7px 9px; font:700 9px Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }

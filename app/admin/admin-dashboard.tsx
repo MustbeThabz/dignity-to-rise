@@ -41,6 +41,7 @@ export default function AdminDashboard() {
   const [media, setMedia] = useState<Media[]>([]);
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadingChangemakerId, setUploadingChangemakerId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -149,6 +150,32 @@ export default function AdminDashboard() {
     event.target.value = "";
   }
 
+  async function uploadChangemakerImage(index: number, event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    const story = content?.changemakers[index];
+    if (!file || !story) return;
+
+    setUploadingChangemakerId(story.id);
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const response = await fetch("/api/media", { method: "POST", body: form });
+      const uploaded = await response.json();
+      if (!response.ok) {
+        setStatus(uploaded.error ?? "Could not upload the portrait.");
+        return;
+      }
+      updateChangemaker(index, "image", uploaded.url);
+      setMedia((list) => [uploaded, ...list]);
+      setStatus(`${file.name} is attached to ${story.name}. Click Save and publish when you are ready.`);
+    } catch {
+      setStatus("Could not upload the portrait. Please try again.");
+    } finally {
+      setUploadingChangemakerId(null);
+      event.target.value = "";
+    }
+  }
+
   if (!content || !data) return <main className="admin-shell"><p>Loading dashboard...</p></main>;
 
   const cards = [["Volunteers", data.counts.volunteers], ["Partners", data.counts.partners], ["Mentors", data.counts.mentors], ["Funders", data.counts.funders]];
@@ -189,7 +216,13 @@ export default function AdminDashboard() {
                 <label>Organisation<input value={story.organisation} onChange={(event) => updateChangemaker(index, "organisation", event.target.value)} /></label>
                 <label>Published date<input type="date" value={story.publishedAt} onChange={(event) => updateChangemaker(index, "publishedAt", event.target.value)} /></label>
                 <label>URL slug<input value={story.slug} onChange={(event) => updateChangemaker(index, "slug", event.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))} /></label>
-                <label>Image path or URL<input list="changemaker-images" value={story.image} onChange={(event) => updateChangemaker(index, "image", event.target.value)} /></label>
+                <div className="full-width changemaker-image-field">
+                  <span>Portrait image</span>
+                  <div className="changemaker-image-upload">
+                    <img src={story.image} alt="Current Changemaker portrait" />
+                    <div><label className="upload-control">{uploadingChangemakerId === story.id ? "Uploading portrait..." : "Upload portrait"}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void uploadChangemakerImage(index, event)} disabled={uploadingChangemakerId !== null} /></label><p>JPG, PNG, or WebP, up to 8 MB. The image is attached automatically.</p></div>
+                  </div>
+                </div>
                 <label className="full-width">Image description<input value={story.imageAlt} onChange={(event) => updateChangemaker(index, "imageAlt", event.target.value)} /></label>
                 <label className="full-width">Feature quote<textarea value={story.quote} onChange={(event) => updateChangemaker(index, "quote", event.target.value)} /></label>
                 <label className="full-width">Short summary<textarea value={story.summary} onChange={(event) => updateChangemaker(index, "summary", event.target.value)} /></label>
@@ -197,7 +230,6 @@ export default function AdminDashboard() {
               </div>
             </article>)}
           </div>
-          <datalist id="changemaker-images">{media.map((image) => <option key={image.url} value={image.url}>{image.name}</option>)}</datalist>
           <button type="button" className="add-changemaker" onClick={addChangemaker}>Add a Changemaker story</button>
         </section>
         <div className="content-submit"><button>Save and publish</button><span>{status}</span></div>
