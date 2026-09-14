@@ -211,7 +211,13 @@ export default function HomepageFrame() {
         /* Image-slot is a custom element from the bundled page. Explicitly
            permit vertical panning so a swipe that starts over a photo scrolls
            the page on touch devices instead of being held by the image. */
-        image-slot, image-slot *, .d2r-reel, .d2r-sectors-grid > a { touch-action:pan-y; -webkit-user-drag:none; }
+        /* The generated image component installs its own touch listeners.
+           On phones those listeners can cancel a page swipe that begins on a
+           photo. Images are presentation-only: disabling their hit testing
+           lets the surrounding card/link receive taps and the document
+           receive vertical swipes. */
+        #d2r-page image-slot, #d2r-page image-slot * { pointer-events:none !important; touch-action:pan-y; -webkit-user-drag:none; }
+        .d2r-reel, .d2r-sectors-grid > a { touch-action:pan-y; }
         .d2r-mobile-menu-button { display:none; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid currentColor; background:transparent; color:inherit; font:600 10px/1 Barlow,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
         @media (max-width: 760px) {
           #top { height:auto !important; min-height:680px !important; }
